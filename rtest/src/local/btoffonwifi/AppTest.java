@@ -1,0 +1,391 @@
+package local.btoffonwifi;
+
+import static org.junit.Assert.*;
+import static org.robolectric.Shadows.shadowOf;
+
+import android.Manifest;
+import android.app.AlarmManager;
+import android.app.Application;
+import android.app.Notification;
+import android.app.job.JobScheduler;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
+import android.service.quicksettings.Tile;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Switch;
+import android.widget.TextView;
+
+import java.time.Duration;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
+import org.robolectric.android.controller.ActivityController;
+import org.robolectric.android.controller.ServiceController;
+import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowAlarmManager;
+import org.robolectric.shadows.ShadowLooper;
+import org.robolectric.shadows.ShadowSystemClock;
+import org.robolectric.shadows.ShadowWifiInfo;
+
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk = {24, 31, 34, 35})
+public class AppTest {
+    private Application app;
+    private BluetoothAdapter bt;
+    private Prefs p;
+
+    @Before
+    public void setUp() {
+        app = RuntimeEnvironment.getApplication();
+        shadowOf(app).grantPermissions(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.BLUETOOTH,
+                Manifest.permission.BLUETOOTH_ADMIN);
+        bt = ((BluetoothManager) app.getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
+        assertNotNull("adapter", bt);
+        p = new Prefs(app);
+    }
+
+    private void onWifi(String ssid) {
+        WifiManager wm = (WifiManager) app.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = ShadowWifiInfo.newInstance();
+        shadowOf(info).setSSID(ssid == null ? "<unknown ssid>" : ssid);
+        shadowOf(wm).setConnectionInfo(info);
+    }
+
+    private void watch(String ssid) {
+        p.setEnabled(true);
+        p.setSsid(ssid);
+    }
+
+    private void idle() {
+        ShadowLooper.idleMainLooper();
+    }
+
+    private void btBroadcast(int state) {
+        app.sendBroadcast(new Intent(BluetoothAdapter.ACTION_STATE_CHANGED)
+                .putExtra(BluetoothAdapter.EXTRA_STATE, state));
+        idle();
+    }
+
+    // ---- the rule ----
+
+    @Test
+    public void ssidIsReadAndNormalized() {
+        onWifi("Home");
+        assertEquals("Home", Wifi.currentSsid(app));
+        onWifi(null);
+        assertNull(Wifi.currentSsid(app));
+    }
+
+    @Test
+    public void turnsBluetoothOffOnTargetWifi() {
+        watch("Home");
+        onWifi("Home");
+        bt.enable();
+        assertTrue(Bt.isOn(app));
+        Controller.evaluate(app, null);
+        assertFalse("bt must be off", bt.isEnabled());
+        assertTrue(p.lastEvent().contains("turned off"));
+    }
+
+    @Test
+    public void leavesBluetoothAloneOnOtherWifiOrWhenDisabledOrUnknown() {
+        watch("Home");
+        onWifi("Office");
+        bt.enable();
+        Controller.evaluate(app, null);
+        assertTrue("other wifi", bt.isEnabled());
+
+        onWifi(null);
+        Controller.evaluate(app, null);
+        assertTrue("unknown ssid", bt.isEnabled());
+
+        onWifi("Home");
+        p.setEnabled(false);
+        Controller.evaluate(app, null);
+        assertTrue("feature off", bt.isEnabled());
+
+        p.setEnabled(true);
+        p.setSsid("");
+        Controller.evaluate(app, null);
+        assertTrue("no ssid configured", bt.isEnabled());
+    }
+
+    // ---- the timer ----
+
+    @Test
+    public void overrideTurnsBluetoothOnAndHoldsItThenExpires() {
+        watch("Home");
+        onWifi("Home");
+        assertFalse(bt.isEnabled());
+
+        long t0 = System.currentTimeMillis();
+        assertTrue(Controller.pressOverride(app));
+        assertTrue("bt on after press", bt.isEnabled());
+        long until1 = p.until();
+        assertEquals(30 * 60000L, until1 - t0, 2000);
+
+        Controller.pressOverride(app);
+        long until2 = p.until();
+        assertEquals("second press adds a step", 30 * 60000L, until2 - until1, 2000);
+
+        AlarmManager am = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
+        ShadowAlarmManager.ScheduledAlarm alarm = shadowOf(am).getNextScheduledAlarm();
+        assertNotNull("expiry alarm scheduled", alarm);
+        assertEquals(until2, alarm.triggerAtTime);
+        assertEquals(AlarmReceiver.class.getName(),
+                shadowOf(alarm.operation).getSavedIntent().getComponent().getClassName());
+
+        Controller.evaluate(app, null);
+        assertTrue("held on while timer runs", bt.isEnabled());
+
+        // the harness cannot move System.currentTimeMillis(), so move the stored end time instead
+        p.setUntil(System.currentTimeMillis() - 1000);
+        new AlarmReceiver().onReceive(app, shadowOf(alarm.operation).getSavedIntent());
+        assertFalse("bt off after expiry on target wifi", bt.isEnabled());
+        assertEquals(0, p.until());
+    }
+
+    @Test
+    public void expiryAwayFromTargetWifiLeavesBluetoothOn() {
+        watch("Home");
+        onWifi("Office");
+        Controller.pressOverride(app);
+        p.setUntil(System.currentTimeMillis() - 1000);
+        new AlarmReceiver().onReceive(app, new Intent());
+        assertTrue(bt.isEnabled());
+        assertEquals(0, p.until());
+    }
+
+    @Test
+    public void endTimerNowAppliesRuleImmediately() {
+        watch("Home");
+        onWifi("Home");
+        Controller.pressOverride(app);
+        assertTrue(bt.isEnabled());
+        Controller.cancelOverride(app, true);
+        assertFalse(bt.isEnabled());
+        AlarmManager am = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
+        assertNull("alarm cancelled", shadowOf(am).getNextScheduledAlarm());
+    }
+
+    // ---- background service ----
+
+    @Test
+    public void serviceStartsForegroundRegistersListenersAndReactsToBluetoothOn() {
+        watch("Home");
+        onWifi("Home");
+        ServiceController<GuardService> sc = Robolectric.buildService(GuardService.class).create().startCommand(0, 1);
+        GuardService s = sc.get();
+        Notification n = shadowOf(s).getLastForegroundNotification();
+        assertNotNull("foreground notification", n);
+        assertTrue(String.valueOf(n.extras.getCharSequence(Notification.EXTRA_TEXT)).contains("Home"));
+        assertTrue(GuardService.running);
+        ConnectivityManager cm = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
+        assertEquals("one network callback", 1, shadowOf(cm).getNetworkCallbacks().size());
+
+        // Bluetooth switched on from system settings while on the Wi-Fi, no timer: off again
+        bt.enable();
+        btBroadcast(BluetoothAdapter.STATE_ON);
+        assertFalse("bt forced off", bt.isEnabled());
+
+        // with a timer running the same event is ignored
+        Controller.pressOverride(app);
+        btBroadcast(BluetoothAdapter.STATE_ON);
+        assertTrue("bt held on by timer", bt.isEnabled());
+
+        // user switches Bluetooth off during the timer (after the grace window): timer ends
+        p.setLastPress(System.currentTimeMillis() - 60000);
+        bt.disable();
+        btBroadcast(BluetoothAdapter.STATE_OFF);
+        assertEquals("timer cancelled by manual off", 0, p.until());
+        assertFalse(bt.isEnabled());
+
+        sc.destroy();
+        assertFalse(GuardService.running);
+        assertEquals("callback unregistered", 0, shadowOf(cm).getNetworkCallbacks().size());
+    }
+
+    @Test
+    public void networkCallbackTriggersRule() {
+        watch("Home");
+        onWifi("Office");
+        ServiceController<GuardService> sc = Robolectric.buildService(GuardService.class).create().startCommand(0, 1);
+        bt.enable();
+        ConnectivityManager cm = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager.NetworkCallback cb = shadowOf(cm).getNetworkCallbacks().iterator().next();
+        cb.onAvailable(cm.getActiveNetwork());
+        assertTrue("other wifi: stays on", bt.isEnabled());
+        onWifi("Home");
+        cb.onAvailable(cm.getActiveNetwork());
+        assertFalse("target wifi: off", bt.isEnabled());
+        sc.destroy();
+    }
+
+    @Test
+    public void serviceStopsItselfWhenFeatureIsOff() {
+        p.setEnabled(false);
+        ServiceController<GuardService> sc = Robolectric.buildService(GuardService.class).create().startCommand(0, 1);
+        assertTrue(shadowOf(sc.get()).isStoppedBySelf());
+        sc.destroy();
+    }
+
+    @Test
+    public void bootReceiverStartsWatcherAndJob() {
+        watch("Home");
+        onWifi("Home");
+        bt.enable();
+        new BootReceiver().onReceive(app, new Intent(Intent.ACTION_BOOT_COMPLETED));
+        Intent started = shadowOf(app).getNextStartedService();
+        assertNotNull("service start requested", started);
+        assertEquals(GuardService.class.getName(), started.getComponent().getClassName());
+        JobScheduler js = (JobScheduler) app.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        assertEquals(1, js.getAllPendingJobs().size());
+        assertTrue(js.getAllPendingJobs().get(0).isPeriodic());
+        assertTrue(js.getAllPendingJobs().get(0).isPersisted());
+        assertFalse("rule applied at boot", bt.isEnabled());
+    }
+
+    @Test
+    public void bootReceiverDoesNothingWhenFeatureIsOff() {
+        new BootReceiver().onReceive(app, new Intent(Intent.ACTION_BOOT_COMPLETED));
+        assertNull(shadowOf(app).getNextStartedService());
+    }
+
+    @Test
+    public void periodicJobAppliesRule() {
+        watch("Home");
+        onWifi("Home");
+        bt.enable();
+        WatchJob job = Robolectric.buildService(WatchJob.class).create().get();
+        assertFalse(job.onStartJob(null));
+        assertFalse(bt.isEnabled());
+    }
+
+    // ---- quick settings tile ----
+
+    @Test
+    public void tileTapsExtendTimer() {
+        watch("Home");
+        onWifi("Home");
+        OverrideTile tile = Robolectric.buildService(OverrideTile.class).create().get();
+        tile.onStartListening();
+        Tile qs = tile.getQsTile();
+        assertNotNull("tile object", qs);
+        assertEquals(Tile.STATE_INACTIVE, qs.getState());
+
+        long t0 = System.currentTimeMillis();
+        tile.onClick();
+        assertTrue("bt on after tile tap", bt.isEnabled());
+        assertEquals(30 * 60000L, p.until() - t0, 2000);
+        tile.onClick();
+        tile.onClick();
+        assertEquals("three taps = 90 min", 90 * 60000L, p.until() - t0, 2000);
+        assertEquals(Tile.STATE_ACTIVE, qs.getState());
+        String shown = Build.VERSION.SDK_INT >= 29 ? String.valueOf(qs.getSubtitle()) : String.valueOf(qs.getLabel());
+        assertTrue(shown, shown.toLowerCase().contains("until"));
+    }
+
+    // ---- screen ----
+
+    @Test
+    public void activityShowsStateAndButtonsWork() {
+        watch("Home");
+        onWifi("Home");
+        ActivityController<MainActivity> ac = Robolectric.buildActivity(MainActivity.class).setup();
+        MainActivity a = ac.get();
+        idle();
+
+        assertEquals("Home", ((EditText) a.findViewById(R.id.ed_ssid)).getText().toString());
+        assertTrue(((Switch) a.findViewById(R.id.sw_enabled)).isChecked());
+        String status = ((TextView) a.findViewById(R.id.tv_status)).getText().toString();
+        assertTrue(status, status.contains("\"Home\"") && status.contains("(match)") && status.contains("Bluetooth: off"));
+        assertEquals(View.VISIBLE, a.findViewById(R.id.btn_tile).getVisibility());
+
+        Button override = a.findViewById(R.id.btn_override);
+        Button cancel = a.findViewById(R.id.btn_cancel);
+        assertFalse(cancel.isEnabled());
+        override.performClick();
+        override.performClick();
+        assertTrue(bt.isEnabled());
+        assertTrue(p.until() > System.currentTimeMillis() + 55 * 60000L);
+        assertTrue(cancel.isEnabled());
+        assertTrue(((TextView) a.findViewById(R.id.tv_override)).getText().toString().contains("left"));
+
+        cancel.performClick();
+        assertFalse("end now on target wifi turns bt off", bt.isEnabled());
+        assertEquals(0, p.until());
+
+        ((EditText) a.findViewById(R.id.ed_ssid)).setText("  Office ");
+        assertEquals("Office", p.ssid());
+
+        onWifi("Cafe");
+        a.findViewById(R.id.btn_current).performClick();
+        assertEquals("Cafe", p.ssid());
+
+        Switch sw = a.findViewById(R.id.sw_enabled);
+        sw.performClick();
+        assertFalse(p.enabled());
+        sw.performClick();
+        assertTrue(p.enabled());
+
+        a.findViewById(R.id.btn_tile).performClick();
+        idle();
+        // Android 13+: system "add tile" prompt is requested; older: instructions dialog is shown
+        assertEquals(Build.VERSION.SDK_INT < 33,
+                org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog() != null);
+        ac.pause().stop().destroy();
+    }
+
+    @Test
+    public void setupButtonRequestsMissingPermissionsInOrder() {
+        shadowOf(app).denyPermissions(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                Manifest.permission.BLUETOOTH_CONNECT);
+        ActivityController<MainActivity> ac = Robolectric.buildActivity(MainActivity.class).setup();
+        MainActivity a = ac.get();
+        idle();
+        Button setup = a.findViewById(R.id.btn_setup);
+        assertEquals(View.VISIBLE, setup.getVisibility());
+
+        setup.performClick();
+        assertEquals(Manifest.permission.ACCESS_FINE_LOCATION,
+                shadowOf(a).getLastRequestedPermission().requestedPermissions[0]);
+
+        shadowOf(app).grantPermissions(Manifest.permission.ACCESS_FINE_LOCATION);
+        setup.performClick();
+        String second = shadowOf(a).getLastRequestedPermission().requestedPermissions[0];
+        if (Build.VERSION.SDK_INT >= 29) {
+            assertEquals(Manifest.permission.ACCESS_BACKGROUND_LOCATION, second);
+            shadowOf(app).grantPermissions(Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+            setup.performClick();
+        }
+        if (Build.VERSION.SDK_INT >= 31) {
+            assertEquals(Manifest.permission.BLUETOOTH_CONNECT,
+                    shadowOf(a).getLastRequestedPermission().requestedPermissions[0]);
+            // without the permission the big button asks for it instead of starting a timer
+            a.findViewById(R.id.btn_override).performClick();
+            assertEquals(0, p.until());
+        }
+        ac.pause().stop().destroy();
+    }
+}

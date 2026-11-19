@@ -1,0 +1,201 @@
+JUnit version 4.13.2
+.Intent = Intent { act=android.bluetooth.adapter.action.STATE_CHANGED (has extras) }; Matching wrappers: [Wrapper[receiver=[local.btoffonwifi.GuardService$1@7adb78da], context=[android.app.ContextImpl@5e8caeb9], intentFilter=[android.content.IntentFilter@6d10399b]]]
+Intent = Intent { act=android.bluetooth.adapter.action.STATE_CHANGED (has extras) }; Matching wrappers: [Wrapper[receiver=[local.btoffonwifi.GuardService$1@7adb78da], context=[android.app.ContextImpl@5e8caeb9], intentFilter=[android.content.IntentFilter@6d10399b]]]
+Intent = Intent { act=android.bluetooth.adapter.action.STATE_CHANGED (has extras) }; Matching wrappers: [Wrapper[receiver=[local.btoffonwifi.GuardService$1@7adb78da], context=[android.app.ContextImpl@5e8caeb9], intentFilter=[android.content.IntentFilter@6d10399b]]]
+.D/BluetoothAdapter: onBluetoothServiceUp: null
+Intent = Intent { act=android.bluetooth.adapter.action.STATE_CHANGED (has extras) }; Matching wrappers: [Wrapper[receiver=[local.btoffonwifi.GuardService$1@940cf18], context=[android.app.ContextImpl@604cfe65], intentFilter=[android.content.IntentFilter@6e092166]]]
+Intent = Intent { act=android.bluetooth.adapter.action.STATE_CHANGED (has extras) }; Matching wrappers: [Wrapper[receiver=[local.btoffonwifi.GuardService$1@940cf18], context=[android.app.ContextImpl@604cfe65], intentFilter=[android.content.IntentFilter@6e092166]]]
+Intent = Intent { act=android.bluetooth.adapter.action.STATE_CHANGED (has extras) }; Matching wrappers: [Wrapper[receiver=[local.btoffonwifi.GuardService$1@940cf18], context=[android.app.ContextImpl@604cfe65], intentFilter=[android.content.IntentFilter@6e092166]]]
+.Intent = Intent { act=android.bluetooth.adapter.action.STATE_CHANGED (has extras) }; Matching wrappers: [Wrapper[receiver=[local.btoffonwifi.GuardService$1@a9c719c], context=[android.app.ContextImpl@6c4c2e4], intentFilter=[android.content.IntentFilter@6206e6a3]]]
+Intent = Intent { act=android.bluetooth.adapter.action.STATE_CHANGED (has extras) }; Matching wrappers: [Wrapper[receiver=[local.btoffonwifi.GuardService$1@a9c719c], context=[android.app.ContextImpl@6c4c2e4], intentFilter=[android.content.IntentFilter@6206e6a3]]]
+Intent = Intent { act=android.bluetooth.adapter.action.STATE_CHANGED (has extras) }; Matching wrappers: [Wrapper[receiver=[local.btoffonwifi.GuardService$1@a9c719c], context=[android.app.ContextImpl@6c4c2e4], intentFilter=[android.content.IntentFilter@6206e6a3]]]
+.W/OverlayConfig: partition_order.xml does not exist.
+Intent = Intent { act=android.bluetooth.adapter.action.STATE_CHANGED (has extras) }; Matching wrappers: [Wrapper[receiver=[local.btoffonwifi.GuardService$1@42cd25c7], context=[android.app.ContextImpl@3eaccb36], intentFilter=[android.content.IntentFilter@6dd260e0]]]
+Intent = Intent { act=android.bluetooth.adapter.action.STATE_CHANGED (has extras) }; Matching wrappers: [Wrapper[receiver=[local.btoffonwifi.GuardService$1@42cd25c7], context=[android.app.ContextImpl@3eaccb36], intentFilter=[android.content.IntentFilter@6dd260e0]]]
+Intent = Intent { act=android.bluetooth.adapter.action.STATE_CHANGED (has extras) }; Matching wrappers: [Wrapper[receiver=[local.btoffonwifi.GuardService$1@42cd25c7], context=[android.app.ContextImpl@3eaccb36], intentFilter=[android.content.IntentFilter@6dd260e0]]]
+....W/OverlayConfig: partition_order.xml does not exist.
+.D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@8775922 in: PRE_ON_CREATE
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@8775922 in: CREATED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@8775922 in: STARTED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@8775922 in: RESUMED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@8775922 in: PAUSED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@8775922 in: STOPPED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@8775922 in: DESTROYED
+.D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@10e5b964 in: PRE_ON_CREATE
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@10e5b964 in: CREATED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@10e5b964 in: STARTED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@10e5b964 in: RESUMED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@10e5b964 in: PAUSED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@10e5b964 in: STOPPED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@10e5b964 in: DESTROYED
+.D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@534ac06a in: PRE_ON_CREATE
+W/VirtualDeviceManager: Failed to retrieve virtual devices; no virtual device manager service.
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@534ac06a in: CREATED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@534ac06a in: STARTED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@534ac06a in: RESUMED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@534ac06a in: PAUSED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@534ac06a in: STOPPED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@534ac06a in: DESTROYED
+W/WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$Lambda$707/0x000078f0c94f5cc8@55c59f23
+.W/OverlayConfig: partition_order.xml does not exist.
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@a40216a in: PRE_ON_CREATE
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@a40216a in: CREATED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@a40216a in: STARTED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@a40216a in: RESUMED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@a40216a in: PAUSED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@a40216a in: STOPPED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@a40216a in: DESTROYED
+W/WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$Lambda$796/0x000078f0c96b95d8@507ca1fa
+....W/OverlayConfig: partition_order.xml does not exist.
+....W/OverlayConfig: partition_order.xml does not exist.
+....W/OverlayConfig: partition_order.xml does not exist.
+....W/OverlayConfig: partition_order.xml does not exist.
+....W/OverlayConfig: partition_order.xml does not exist.
+....W/OverlayConfig: partition_order.xml does not exist.
+....W/OverlayConfig: partition_order.xml does not exist.
+.D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4d7f62ab in: PRE_ON_CREATE
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4d7f62ab in: CREATED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4d7f62ab in: STARTED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4d7f62ab in: RESUMED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4d7f62ab in: PAUSED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4d7f62ab in: STOPPED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4d7f62ab in: DESTROYED
+.D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@165bea5d in: PRE_ON_CREATE
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@165bea5d in: CREATED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@165bea5d in: STARTED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@165bea5d in: RESUMED
+E/ApplicationPackageManager: Permission controller not found.
+android.content.pm.PackageManager$NameNotFoundException: Application package org.robolectric.permissioncontroller not found
+	at android.app.ContextImpl.createPackageContextAsUser(ContextImpl.java:2525)
+	at android.app.ContextImpl.createPackageContext(ContextImpl.java:2490)
+	at android.app.ApplicationPackageManager.getBackgroundPermissionOptionLabel(ApplicationPackageManager.java:839)
+	at local.btoffonwifi.MainActivity$Api30.allTheTimeLabel(MainActivity.java:292)
+	at local.btoffonwifi.MainActivity.runStep(MainActivity.java:220)
+	at local.btoffonwifi.MainActivity.lambda$onCreate$4(MainActivity.java:130)
+	at android.view.View.performClick(View.java:7441)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at org.robolectric.shadows.ShadowView$_View_$$Reflector202.performClick(Unknown Source)
+	at org.robolectric.shadows.ShadowView.performClick(ShadowView.java:274)
+	at android.view.View.performClick(View.java)
+	at local.btoffonwifi.AppTest.setupButtonRequestsMissingPermissionsInOrder(AppTest.java:375)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+W/Activity: Can request only one set of permissions at a time
+W/Activity: Can request only one set of permissions at a time
+W/Activity: Can request only one set of permissions at a time
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@165bea5d in: PAUSED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@165bea5d in: STOPPED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@165bea5d in: DESTROYED
+.D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4b184293 in: PRE_ON_CREATE
+W/VirtualDeviceManager: Failed to retrieve virtual devices; no virtual device manager service.
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4b184293 in: CREATED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4b184293 in: STARTED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4b184293 in: RESUMED
+E/ApplicationPackageManager: Permission controller not found.
+android.content.pm.PackageManager$NameNotFoundException: Application package org.robolectric.permissioncontroller not found
+	at android.app.ContextImpl.createPackageContextAsUser(ContextImpl.java:2695)
+	at android.app.ContextImpl.createPackageContext(ContextImpl.java:2660)
+	at android.app.ApplicationPackageManager.getBackgroundPermissionOptionLabel(ApplicationPackageManager.java:950)
+	at local.btoffonwifi.MainActivity$Api30.allTheTimeLabel(MainActivity.java:292)
+	at local.btoffonwifi.MainActivity.runStep(MainActivity.java:220)
+	at local.btoffonwifi.MainActivity.lambda$onCreate$4(MainActivity.java:130)
+	at android.view.View.performClick(View.java:7659)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at org.robolectric.shadows.ShadowView$_View_$$Reflector235.performClick(Unknown Source)
+	at org.robolectric.shadows.ShadowView.performClick(ShadowView.java:274)
+	at android.view.View.performClick(View.java)
+	at local.btoffonwifi.AppTest.setupButtonRequestsMissingPermissionsInOrder(AppTest.java:375)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+W/Activity: Can request only one set of permissions at a time
+W/Activity: Can request only one set of permissions at a time
+W/Activity: Can request only one set of permissions at a time
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4b184293 in: PAUSED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4b184293 in: STOPPED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4b184293 in: DESTROYED
+W/WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=falsecallback=android.view.ViewRootImpl$$Lambda$707/0x000078f0c94f5cc8@1fad7020
+.W/OverlayConfig: partition_order.xml does not exist.
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4a8e3a81 in: PRE_ON_CREATE
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4a8e3a81 in: CREATED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4a8e3a81 in: STARTED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4a8e3a81 in: RESUMED
+E/ApplicationPackageManager: Permission controller not found.
+android.content.pm.PackageManager$NameNotFoundException: Application package org.robolectric.permissioncontroller not found
+	at android.app.ContextImpl.createPackageContextAsUser(ContextImpl.java:2768)
+	at android.app.ContextImpl.createPackageContext(ContextImpl.java:2735)
+	at android.app.ApplicationPackageManager.getBackgroundPermissionOptionLabel(ApplicationPackageManager.java:975)
+	at local.btoffonwifi.MainActivity$Api30.allTheTimeLabel(MainActivity.java:292)
+	at local.btoffonwifi.MainActivity.runStep(MainActivity.java:220)
+	at local.btoffonwifi.MainActivity.lambda$onCreate$4(MainActivity.java:130)
+	at android.view.View.performClick(View.java:8028)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at org.robolectric.shadows.ShadowView$_View_$$Reflector266.performClick(Unknown Source)
+	at org.robolectric.shadows.ShadowView.performClick(ShadowView.java:274)
+	at android.view.View.performClick(View.java)
+	at local.btoffonwifi.AppTest.setupButtonRequestsMissingPermissionsInOrder(AppTest.java:375)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+W/Activity: Can request only one set of permissions at a time
+W/Activity: Can request only one set of permissions at a time
+W/Activity: Can request only one set of permissions at a time
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4a8e3a81 in: PAUSED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4a8e3a81 in: STOPPED
+D/LifecycleMonitor: Lifecycle status change: local.btoffonwifi.MainActivity@4a8e3a81 in: DESTROYED
+W/WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$Lambda$796/0x000078f0c96b95d8@43a8711
+....W/OverlayConfig: partition_order.xml does not exist.
+....W/OverlayConfig: partition_order.xml does not exist.
+....W/OverlayConfig: partition_order.xml does not exist.
+....W/OverlayConfig: partition_order.xml does not exist.
+
+Time: 35.676
+
+OK (60 tests)
+

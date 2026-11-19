@@ -1,0 +1,9 @@
+# Signing key: keep out of the public repo
+signing/
+*.jks
+*.keystore
+
+# Build output (attach APKs to GitHub Releases instead)
+*.apk
+build/
+rtest/target/
