@@ -2,6 +2,7 @@ package local.btoffonwifi;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 
 final class Bt {
@@ -27,6 +28,21 @@ final class Bt {
             if (a == null) return false;
             int s = a.getState();
             return s == BluetoothAdapter.STATE_ON || s == BluetoothAdapter.STATE_TURNING_ON;
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Earbuds or a headset connected over classic Bluetooth audio (A2DP or hands-free).
+     * Low-energy devices such as watches and trackers deliberately do not count.
+     */
+    static boolean audioConnected(Context c) {
+        try {
+            BluetoothAdapter a = adapter(c);
+            if (a == null) return false;
+            return a.getProfileConnectionState(BluetoothProfile.A2DP) == BluetoothProfile.STATE_CONNECTED
+                    || a.getProfileConnectionState(BluetoothProfile.HEADSET) == BluetoothProfile.STATE_CONNECTED;
         } catch (RuntimeException e) {
             return false;
         }

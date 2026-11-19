@@ -28,6 +28,10 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
     private static final int[] STEPS = {15, 30, 60, 120};
     private static final String[] STEP_LABELS = {"15 min", "30 min", "1 hour", "2 hours"};
+    private static final int[] ARRIVE = {0, 1, 2, 5, 10, 15};
+    private static final String[] ARRIVE_LABELS = {"immediately", "1 min", "2 min", "5 min", "10 min", "15 min"};
+    private static final int[] LEAVE = {1, 2, 5, 10, 15};
+    private static final String[] LEAVE_LABELS = {"1 min", "2 min", "5 min", "10 min", "15 min"};
 
     private static final int STEP_LOCATION = 1;
     private static final int STEP_BACKGROUND = 2;
@@ -81,6 +85,17 @@ public class MainActivity extends Activity {
             refresh();
         });
 
+        Switch swAudio = findViewById(R.id.sw_audio);
+        swAudio.setChecked(p.keepForAudio());
+        swAudio.setOnCheckedChangeListener((v, on) -> {
+            p.setKeepForAudio(on);
+            Controller.evaluate(this, null);
+            refresh();
+        });
+
+        minutesSpinner(R.id.sp_arrive, ARRIVE, ARRIVE_LABELS, p.arriveDelayMin(), p::setArriveDelayMin);
+        minutesSpinner(R.id.sp_leave, LEAVE, LEAVE_LABELS, p.leaveGraceMin(), p::setLeaveGraceMin);
+
         Switch swRestore = findViewById(R.id.sw_restore);
         swRestore.setChecked(p.restoreOnLeave());
         swRestore.setOnCheckedChangeListener((v, on) -> {
@@ -101,7 +116,11 @@ public class MainActivity extends Activity {
         btnCurrent.setOnClickListener(v -> {
             String s = Wifi.currentSsid(this);
             if (s != null) {
-                edSsid.setText(s);
+                if (OverrideLogic.matches(p.ssid(), s)) {
+                    toast("\"" + s + "\" is already in the list");
+                } else {
+                    edSsid.setText(OverrideLogic.addTarget(p.ssid(), s));
+                }
             } else {
                 toast(Wifi.wifiConnected(this)
                         ? "Android will not reveal the Wi-Fi name yet - finish Setup below"
@@ -154,6 +173,31 @@ public class MainActivity extends Activity {
         super.onPause();
     }
 
+    /** A spinner of minute values; picking one stores it and re-applies the rule. */
+    private void minutesSpinner(int id, int[] values, String[] labels, int current,
+                                java.util.function.IntConsumer store) {
+        Spinner sp = findViewById(id);
+        ArrayAdapter<String> ad = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, labels);
+        ad.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sp.setAdapter(ad);
+        int sel = 0;
+        for (int i = 0; i < values.length; i++) if (values[i] == current) sel = i;
+        sp.setSelection(sel);
+        sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override public void onItemSelected(AdapterView<?> parent, View view, int pos, long rowId) {
+                if (values[pos] == currentValue(id)) return;
+                store.accept(values[pos]);
+                Controller.evaluate(MainActivity.this, null);
+                refresh();
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
+    }
+
+    private int currentValue(int spinnerId) {
+        return spinnerId == R.id.sp_arrive ? p.arriveDelayMin() : p.leaveGraceMin();
+    }
+
     private void toast(String s) {
         Toast.makeText(this, s, Toast.LENGTH_LONG).show();
     }
@@ -170,8 +214,7 @@ public class MainActivity extends Activity {
                 : Wifi.wifiConnected(this) ? "connected, name hidden by Android (see Setup)" : "not connected";
         boolean match = OverrideLogic.matches(p.ssid(), ssid);
         tvStatus.setText("Wi-Fi now: " + wifi + (match ? "  (match)" : "")
-                + "\nBluetooth: " + (!Bt.available(this) ? "not available" : Bt.isOn(this) ? "on"
-                        : p.offByApp() ? "off (switched off by this app)" : "off")
+                + "\nBluetooth: " + btStatus()
                 + "\nWatcher: " + (!p.enabled() ? "switched off" : GuardService.running ? "running" : "starting"));
 
         btnOverride.setText(active ? "Keep Bluetooth on  +" + label(p.stepMinutes())
@@ -195,6 +238,14 @@ public class MainActivity extends Activity {
 
         String ev = p.lastEvent();
         tvLog.setText(ev.isEmpty() ? "" : "Last action: " + ev);
+    }
+
+    private String btStatus() {
+        if (!Bt.available(this)) return "not available";
+        if (!Bt.isOn(this)) return p.offByApp() ? "off (switched off by this app)" : "off";
+        if (p.keepForAudio() && Bt.audioConnected(this)) return "on (earbuds or headset connected)";
+        long offAt = Controller.pendingOffAt(this);
+        return offAt > 0 ? "on, goes off at " + Controller.clock(this, offAt) : "on";
     }
 
     private static String label(int minutes) {

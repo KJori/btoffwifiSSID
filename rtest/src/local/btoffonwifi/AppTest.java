@@ -8,8 +8,11 @@ import android.app.AlarmManager;
 import android.app.Application;
 import android.app.Notification;
 import android.app.job.JobScheduler;
+import android.app.NotificationManager;
+import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -43,6 +46,8 @@ import org.robolectric.shadows.ShadowWifiInfo;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = {24, 31, 34, 35})
 public class AppTest {
+    /** Default leave wait (1 min). */
+    private static final long GRACE = 60_000;
     private Application app;
     private BluetoothAdapter bt;
     private Prefs p;
@@ -60,6 +65,7 @@ public class AppTest {
         bt = ((BluetoothManager) app.getSystemService(Context.BLUETOOTH_SERVICE)).getAdapter();
         assertNotNull("adapter", bt);
         p = new Prefs(app);
+        p.setArriveDelayMin(0); // most tests check the rule itself; the delay has its own tests
     }
 
     private void onWifi(String ssid) {
@@ -145,9 +151,9 @@ public class AppTest {
         assertEquals(OverrideLogic.AWAY, OverrideLogic.place("Home", "Office", true));
         assertEquals(OverrideLogic.AWAY, OverrideLogic.place("Home", null, false));
         assertEquals("hidden name is not leaving", OverrideLogic.UNKNOWN, OverrideLogic.place("Home", null, true));
-        assertFalse(OverrideLogic.awayLongEnough(100_000, 0));
-        assertFalse(OverrideLogic.awayLongEnough(100_000, 100_000 - OverrideLogic.LEAVE_GRACE_MS + 1));
-        assertTrue(OverrideLogic.awayLongEnough(100_000, 100_000 - OverrideLogic.LEAVE_GRACE_MS));
+        assertFalse(OverrideLogic.waited(100_000, 0, GRACE));
+        assertFalse(OverrideLogic.waited(100_000, 100_000 - GRACE + 1, GRACE));
+        assertTrue(OverrideLogic.waited(100_000, 100_000 - GRACE, GRACE));
     }
 
     @Test
@@ -160,10 +166,10 @@ public class AppTest {
         AlarmManager am = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
         ShadowAlarmManager.ScheduledAlarm alarm = shadowOf(am).getNextScheduledAlarm();
         assertNotNull("re-check scheduled", alarm);
-        assertEquals(p.awaySince() + OverrideLogic.LEAVE_GRACE_MS, alarm.triggerAtTime);
+        assertEquals(p.awaySince() + GRACE, alarm.triggerAtTime);
 
         // the harness cannot move the clock, so move the stored start of "away" instead
-        p.setAwaySince(System.currentTimeMillis() - OverrideLogic.LEAVE_GRACE_MS - 1000);
+        p.setAwaySince(System.currentTimeMillis() - GRACE - 1000);
         new AlarmReceiver().onReceive(app, shadowOf(alarm.operation).getSavedIntent());
         assertTrue("bt back on after leaving", bt.isEnabled());
         assertFalse(p.offByApp());
@@ -192,7 +198,7 @@ public class AppTest {
         offAtHome();
         p.setRestoreOnLeave(false);
         onWifi("Office");
-        p.setAwaySince(System.currentTimeMillis() - OverrideLogic.LEAVE_GRACE_MS - 1000);
+        p.setAwaySince(System.currentTimeMillis() - GRACE - 1000);
         Controller.evaluate(app, null);
         assertFalse(bt.isEnabled());
     }
@@ -204,7 +210,7 @@ public class AppTest {
         Controller.evaluate(app, null); // bt already off: app did nothing
         assertFalse(p.offByApp());
         onWifi("Office");
-        p.setAwaySince(System.currentTimeMillis() - OverrideLogic.LEAVE_GRACE_MS - 1000);
+        p.setAwaySince(System.currentTimeMillis() - GRACE - 1000);
         Controller.evaluate(app, null);
         assertFalse("user's own off is respected", bt.isEnabled());
     }
@@ -213,7 +219,7 @@ public class AppTest {
     public void hiddenWifiNameIsNotLeaving() {
         offAtHome();
         onWifi(null);
-        p.setAwaySince(System.currentTimeMillis() - OverrideLogic.LEAVE_GRACE_MS - 1000);
+        p.setAwaySince(System.currentTimeMillis() - GRACE - 1000);
         if (Wifi.wifiConnected(app)) {
             Controller.evaluate(app, null);
             assertFalse(bt.isEnabled());
@@ -245,9 +251,162 @@ public class AppTest {
         cb.onLost(cm.getActiveNetwork());
         AlarmManager am = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
         assertNotNull("re-check scheduled after loss", shadowOf(am).getNextScheduledAlarm());
-        p.setAwaySince(System.currentTimeMillis() - OverrideLogic.LEAVE_GRACE_MS - 1000);
+        p.setAwaySince(System.currentTimeMillis() - GRACE - 1000);
         new AlarmReceiver().onReceive(app, new Intent());
         assertTrue(bt.isEnabled());
+        sc.destroy();
+    }
+
+    // ---- arrival delay ----
+
+    @Test
+    public void arrivalDelayWaitsBeforeSwitchingOff() {
+        p.setArriveDelayMin(5);
+        watch("Home");
+        onWifi("Home");
+        bt.enable();
+        Controller.evaluate(app, null);
+        assertTrue("still on during the arrival delay", bt.isEnabled());
+        long home = p.homeSince();
+        assertTrue(home > 0);
+        assertEquals(home + 5 * 60000L, Controller.pendingOffAt(app));
+        AlarmManager am = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
+        ShadowAlarmManager.ScheduledAlarm alarm = shadowOf(am).getNextScheduledAlarm();
+        assertNotNull("re-check at the end of the delay", alarm);
+        assertEquals(home + 5 * 60000L, alarm.triggerAtTime);
+
+        p.setHomeSince(System.currentTimeMillis() - 5 * 60000L - 1000);
+        new AlarmReceiver().onReceive(app, shadowOf(alarm.operation).getSavedIntent());
+        assertFalse("off once the delay has passed", bt.isEnabled());
+        assertTrue(p.offByApp());
+    }
+
+    @Test
+    public void briefReconnectWhileLeavingDoesNotSwitchOff() {
+        p.setArriveDelayMin(5);
+        watch("Home");
+        bt.enable();
+        onWifi("Home");
+        Controller.evaluate(app, null);
+        onWifi("Office");
+        Controller.evaluate(app, null);
+        assertEquals("arrival clock reset when away", 0, p.homeSince());
+        onWifi("Home");
+        Controller.evaluate(app, null);
+        assertTrue("a short visit back does not switch it off", bt.isEnabled());
+    }
+
+    @Test
+    public void leaveWaitIsAdjustable() {
+        offAtHome();
+        p.setLeaveGraceMin(5);
+        onWifi("Office");
+        p.setAwaySince(System.currentTimeMillis() - 2 * 60000L);
+        Controller.evaluate(app, null);
+        assertFalse("2 of 5 minutes: not yet", bt.isEnabled());
+        p.setAwaySince(System.currentTimeMillis() - 5 * 60000L - 1000);
+        Controller.evaluate(app, null);
+        assertTrue(bt.isEnabled());
+    }
+
+    // ---- earbuds / headset ----
+
+    @Test
+    public void earbudsKeepBluetoothOnUntilTheyDisconnect() {
+        watch("Home");
+        onWifi("Home");
+        bt.enable();
+        shadowOf(bt).setProfileConnectionState(BluetoothProfile.A2DP, BluetoothProfile.STATE_CONNECTED);
+        Controller.evaluate(app, null);
+        assertTrue("earbuds connected: stays on", bt.isEnabled());
+        shadowOf(bt).setProfileConnectionState(BluetoothProfile.A2DP, BluetoothProfile.STATE_DISCONNECTED);
+        Controller.onAudioState(app, BluetoothProfile.STATE_DISCONNECTED);
+        assertFalse("off once they disconnect", bt.isEnabled());
+    }
+
+    @Test
+    public void headsetKeepsBluetoothOn() {
+        watch("Home");
+        onWifi("Home");
+        bt.enable();
+        shadowOf(bt).setProfileConnectionState(BluetoothProfile.HEADSET, BluetoothProfile.STATE_CONNECTED);
+        Controller.evaluate(app, null);
+        assertTrue(bt.isEnabled());
+    }
+
+    @Test
+    public void earbudsOptionOffSwitchesOffAnyway() {
+        p.setKeepForAudio(false);
+        watch("Home");
+        onWifi("Home");
+        bt.enable();
+        shadowOf(bt).setProfileConnectionState(BluetoothProfile.A2DP, BluetoothProfile.STATE_CONNECTED);
+        Controller.evaluate(app, null);
+        assertFalse(bt.isEnabled());
+    }
+
+    @Test
+    public void earbudsDisconnectBroadcastReachesService() {
+        watch("Home");
+        onWifi("Home");
+        ServiceController<GuardService> sc = Robolectric.buildService(GuardService.class).create().startCommand(0, 1);
+        bt.enable();
+        shadowOf(bt).setProfileConnectionState(BluetoothProfile.A2DP, BluetoothProfile.STATE_CONNECTED);
+        Controller.evaluate(app, null);
+        assertTrue(bt.isEnabled());
+        shadowOf(bt).setProfileConnectionState(BluetoothProfile.A2DP, BluetoothProfile.STATE_DISCONNECTED);
+        app.sendBroadcast(new Intent(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED)
+                .putExtra(BluetoothProfile.EXTRA_STATE, BluetoothProfile.STATE_DISCONNECTED));
+        idle();
+        assertFalse(bt.isEnabled());
+        sc.destroy();
+    }
+
+    // ---- several Wi-Fi networks ----
+
+    @Test
+    public void severalWifiNetworks() {
+        watch("Home\nOffice");
+        onWifi("Office");
+        bt.enable();
+        Controller.evaluate(app, null);
+        assertFalse("second network counts too", bt.isEnabled());
+        p.setAwaySince(System.currentTimeMillis() - GRACE - 1000);
+        onWifi("Cafe");
+        Controller.evaluate(app, null);
+        assertTrue("away from all of them: back on", bt.isEnabled());
+
+        assertEquals("\"Home\", \"Office\"", OverrideLogic.describe(" Home\n\nOffice "));
+        assertEquals("Home\nOffice", OverrideLogic.addTarget("Home\nOffice", "Office"));
+        assertEquals("Home\nOffice\nCafe", OverrideLogic.addTarget("Home\nOffice", " Cafe "));
+        assertEquals("Cafe", OverrideLogic.addTarget("", "Cafe"));
+    }
+
+    // ---- notification ----
+
+    @Test
+    public void notificationShowsStateAndButtonsWork() {
+        watch("Home");
+        onWifi("Home");
+        ServiceController<GuardService> sc = Robolectric.buildService(GuardService.class).create().startCommand(0, 1);
+        NotificationManager nm = (NotificationManager) app.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        new ActionReceiver().onReceive(app, new Intent(ActionReceiver.PRESS));
+        assertTrue("button turns bt on", bt.isEnabled());
+        assertTrue(p.until() > System.currentTimeMillis());
+        Notification n = shadowOf(nm).getNotification(1);
+        assertNotNull(n);
+        String text = String.valueOf(n.extras.getCharSequence(Notification.EXTRA_TEXT));
+        assertTrue(text, text.contains("until"));
+        assertEquals("+ step and End timer", 2, n.actions.length);
+
+        new ActionReceiver().onReceive(app, new Intent(ActionReceiver.CANCEL));
+        assertEquals(0, p.until());
+        assertFalse("rule applied after End timer", bt.isEnabled());
+        n = shadowOf(nm).getNotification(1);
+        text = String.valueOf(n.extras.getCharSequence(Notification.EXTRA_TEXT));
+        assertTrue(text, text.contains("switched off by this app"));
+        assertEquals(1, n.actions.length);
         sc.destroy();
     }
 
@@ -467,7 +626,10 @@ public class AppTest {
 
         onWifi("Cafe");
         a.findViewById(R.id.btn_current).performClick();
-        assertEquals("Cafe", p.ssid());
+        assertEquals("current Wi-Fi is added to the list", "Office\nCafe", p.ssid());
+        a.findViewById(R.id.btn_current).performClick();
+        assertEquals("not added twice", "Office\nCafe", p.ssid());
+        assertTrue(((Switch) a.findViewById(R.id.sw_audio)).isChecked());
 
         Switch sw = a.findViewById(R.id.sw_enabled);
         sw.performClick();

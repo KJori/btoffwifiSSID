@@ -3,6 +3,7 @@ package local.btoffonwifi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -14,6 +15,11 @@ import java.util.Date;
 final class Controller {
     private Controller() {}
 
+    private static final int ALARM_EXPIRY = 1;
+    private static final int ALARM_RECHECK = 2;
+    /** After a Wi-Fi network or earbuds go away, look again this soon in case Android lagged. */
+    private static final long SETTLE_RECHECK_MS = 15_000;
+
     static String clock(Context c, long t) {
         return DateFormat.getTimeFormat(c).format(new Date(t));
     }
@@ -22,19 +28,23 @@ final class Controller {
         p.setLastEvent(clock(c, System.currentTimeMillis()) + "  " + msg);
     }
 
-    private static final int ALARM_EXPIRY = 1;
-    private static final int ALARM_RECHECK = 2;
-    /** After a Wi-Fi network is lost, look again this soon in case Android still reported it. */
-    private static final long LOST_RECHECK_MS = 15_000;
-
     /**
-     * The rule: if watching is enabled, no timer is running and the phone is on the chosen
-     * Wi-Fi, Bluetooth goes off. Optionally, once the phone has left that Wi-Fi, Bluetooth that
-     * this app switched off goes back on.
+     * The rule: if watching is enabled, no timer is running and the phone has been on one of the
+     * chosen Wi-Fi networks for the arrival delay, Bluetooth goes off - unless earbuds or a
+     * headset are connected (optional). Optionally, once the phone has been away for the leave
+     * delay, Bluetooth that this app switched off goes back on.
      *
      * @param knownSsid SSID just delivered by a network callback, or null to look it up
      */
     static synchronized void evaluate(Context c, String knownSsid) {
+        try {
+            decide(c, knownSsid);
+        } finally {
+            GuardService.refreshNotification(c);
+        }
+    }
+
+    private static void decide(Context c, String knownSsid) {
         Prefs p = new Prefs(c);
         long now = System.currentTimeMillis();
         long until = p.until();
@@ -48,11 +58,24 @@ final class Controller {
         int place = OverrideLogic.place(p.ssid(), cur, cur != null || Wifi.wifiConnected(c));
         if (place == OverrideLogic.UNKNOWN) return;
         if (place == OverrideLogic.AWAY) {
+            p.setHomeSince(0);
             restoreIfLeft(c, p, now);
             return;
         }
+
         p.setAwaySince(0);
+        long homeSince = p.homeSince();
+        if (homeSince == 0) {
+            homeSince = now;
+            p.setHomeSince(now);
+        }
         if (!Bt.isOn(c)) return;
+        if (p.keepForAudio() && Bt.audioConnected(c)) return; // looked at again when they disconnect
+        long offAt = homeSince + p.arriveDelayMin() * 60_000L;
+        if (now < offAt) {
+            scheduleRecheck(c, p, offAt);
+            return;
+        }
         if (Bt.set(c, false)) {
             p.setOffByApp(true);
             log(c, p, "Bluetooth turned off (on \"" + cur + "\")");
@@ -69,13 +92,14 @@ final class Controller {
             p.setOffByApp(false); // already back on, nothing left to undo
             return;
         }
-        if (!OverrideLogic.awayLongEnough(now, p.awaySince())) {
-            scheduleAlarm(c, ALARM_RECHECK, p.awaySince() + OverrideLogic.LEAVE_GRACE_MS);
+        long graceMs = p.leaveGraceMin() * 60_000L;
+        if (!OverrideLogic.waited(now, p.awaySince(), graceMs)) {
+            scheduleRecheck(c, p, p.awaySince() + graceMs);
             return;
         }
         if (Bt.set(c, true)) {
             p.setOffByApp(false);
-            log(c, p, "Bluetooth turned back on (left \"" + p.ssid().trim() + "\")");
+            log(c, p, "Bluetooth turned back on (left " + OverrideLogic.describe(p.ssid()) + ")");
         } else {
             log(c, p, "Could not turn Bluetooth back on - check Setup");
         }
@@ -86,12 +110,20 @@ final class Controller {
         Prefs p = new Prefs(c);
         if (p.enabled() && p.restoreOnLeave() && p.offByApp()) {
             // Android may still report the old SSID for a moment; the later check sees the truth.
-            scheduleAlarm(c, ALARM_RECHECK, System.currentTimeMillis() + LOST_RECHECK_MS);
+            scheduleRecheck(c, p, System.currentTimeMillis() + SETTLE_RECHECK_MS);
         }
         evaluate(c, null);
     }
 
-    /** One press of the app button or the tile: Bluetooth on, timer one step longer. */
+    /** Earbuds or a headset connected or disconnected. */
+    static void onAudioState(Context c, int state) {
+        if (state != BluetoothProfile.STATE_DISCONNECTED) return;
+        Prefs p = new Prefs(c);
+        if (p.enabled()) scheduleRecheck(c, p, System.currentTimeMillis() + SETTLE_RECHECK_MS);
+        evaluate(c, null);
+    }
+
+    /** One press of the app button, the tile or the notification: Bluetooth on, timer one step longer. */
     static synchronized boolean pressOverride(Context c) {
         Prefs p = new Prefs(c);
         long now = System.currentTimeMillis();
@@ -102,6 +134,7 @@ final class Controller {
         boolean ok = Bt.isOn(c) || Bt.set(c, true);
         log(c, p, ok ? "Bluetooth kept on until " + clock(c, until)
                 : "Timer set until " + clock(c, until) + ", but Bluetooth could not be turned on");
+        GuardService.refreshNotification(c);
         return ok;
     }
 
@@ -114,6 +147,7 @@ final class Controller {
         }
         scheduleExpiry(c, 0);
         if (reevaluate) evaluate(c, null);
+        else GuardService.refreshNotification(c);
     }
 
     static void onBluetoothState(Context c, int state) {
@@ -132,7 +166,19 @@ final class Controller {
                     cancelOverride(c, false); // user switched Bluetooth off: timer no longer needed
                 }
             }
+            GuardService.refreshNotification(c);
         }
+    }
+
+    /** When Bluetooth will be switched off after arriving, or 0 if nothing is pending. */
+    static long pendingOffAt(Context c) {
+        Prefs p = new Prefs(c);
+        long now = System.currentTimeMillis();
+        if (!p.enabled() || p.homeSince() == 0 || OverrideLogic.active(now, p.until())) return 0;
+        if (!OverrideLogic.matches(p.ssid(), Wifi.currentSsid(c)) || !Bt.isOn(c)) return 0;
+        if (p.keepForAudio() && Bt.audioConnected(c)) return 0;
+        long offAt = p.homeSince() + p.arriveDelayMin() * 60_000L;
+        return offAt > now ? offAt : 0;
     }
 
     static void rescheduleExpiry(Context c) {
@@ -142,6 +188,18 @@ final class Controller {
 
     private static void scheduleExpiry(Context c, long until) {
         scheduleAlarm(c, ALARM_EXPIRY, until);
+    }
+
+    /**
+     * Ask for a re-check at {@code at}. One alarm serves every pending re-check: an earlier one
+     * that is still due is kept, because each re-check schedules whatever later one it needs.
+     */
+    private static void scheduleRecheck(Context c, Prefs p, long at) {
+        long now = System.currentTimeMillis();
+        long pending = p.recheckAt();
+        if (pending > now && pending <= at) return;
+        p.setRecheckAt(at);
+        scheduleAlarm(c, ALARM_RECHECK, at);
     }
 
     /** One alarm per request code; a new time replaces the old one, at <= 0 cancels it. */
@@ -165,7 +223,7 @@ final class Controller {
         try {
             am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pi);
         } catch (RuntimeException e) {
-            // the 15-minute periodic job still ends the timer
+            // the 15-minute periodic job still applies the rule
         }
     }
 
@@ -186,6 +244,7 @@ final class Controller {
         Prefs p = new Prefs(c);
         p.setOffByApp(false); // switching the feature off must not turn Bluetooth on later
         p.setAwaySince(0);
+        p.setRecheckAt(0);
         scheduleAlarm(c, ALARM_RECHECK, 0);
         WatchJob.cancel(c);
         try {

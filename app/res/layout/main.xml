@@ -21,23 +21,54 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Wi-Fi name (SSID, exact, case-sensitive)" />
+            android:text="Wi-Fi names (SSID, exact, case-sensitive), one per line" />
 
         <EditText
             android:id="@+id/ed_ssid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="top"
             android:hint="e.g. HomeNetwork"
             android:importantForAutofill="no"
-            android:inputType="text|textNoSuggestions"
-            android:maxLines="1"
-            android:minHeight="48dp" />
+            android:inputType="text|textNoSuggestions|textMultiLine"
+            android:minHeight="48dp"
+            android:minLines="1" />
 
         <Button
             android:id="@+id/btn_current"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Use current Wi-Fi" />
+            android:text="Add current Wi-Fi" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Switch off after arriving:" />
+            <Spinner
+                android:id="@+id/sp_arrive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp" />
+        </LinearLayout>
+
+        <Switch
+            android:id="@+id/sw_audio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:minHeight="48dp"
+            android:text="Keep Bluetooth on while earbuds or a headset are connected" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Audio devices only. Watches and other low-energy devices do not keep it on."
+            android:textSize="12sp" />
 
         <Switch
             android:id="@+id/sw_restore"
@@ -50,8 +81,24 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Only if this app switched it off. Waits 1 minute away first, so a Wi-Fi drop-out does not count."
+            android:text="Only if this app switched it off. The wait keeps a short Wi-Fi drop-out from counting."
             android:textSize="12sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Back on after being away for:" />
+            <Spinner
+                android:id="@+id/sp_leave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_status"

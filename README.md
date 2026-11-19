@@ -1,32 +1,38 @@
 # BT Off on Wi-Fi
 
-Turns Bluetooth off while the phone is connected to one chosen Wi-Fi network (SSID).
+Turns Bluetooth off while the phone is connected to one of your chosen Wi-Fi networks (SSIDs).
 A timer keeps Bluetooth on temporarily; each press of the app button or the quick-settings
 tile ("BT timer") adds one step (15 min / 30 min / 1 h / 2 h, selectable), up to 24 h.
 
-Package `local.btoffonwifi`, version 1.1. Android 7.0 or newer. No internet permission.
+Package `local.btoffonwifi`, version 1.2. Android 7.0 or newer. No internet permission.
 
 ## Install
 1. Copy `BtOffOnWifi.apk` to the phone and open it. Allow "install unknown apps" when asked.
 2. Play Protect may warn that the app is built for an older Android version. That is
    deliberate (see Limits). Choose "Install anyway".
-3. Open the app, enter the Wi-Fi name (or tap "Use current Wi-Fi"), switch the top toggle on.
+3. Open the app, enter the Wi-Fi names, one per line (or tap "Add current Wi-Fi"), switch the top toggle on.
 4. Tap "Fix next item" until every Setup line shows a tick.
 5. Tap "Add quick settings tile".
 
 ## Behaviour
-- Connected to the chosen Wi-Fi, no timer running: Bluetooth is switched off. If Bluetooth is
-  switched on from the system toggle in that state, it is switched off again.
+- On a chosen Wi-Fi, no timer running: Bluetooth is switched off once the phone has been there for
+  the arrival delay ("Switch off after arriving", default 5 min; "immediately" is an option). If
+  Bluetooth is switched on from the system toggle in that state, it is switched off again.
+- Earbuds or a headset connected (classic Bluetooth audio, A2DP or hands-free): Bluetooth stays on
+  until they disconnect. Watches and other low-energy devices do not count. Can be switched off.
 - Button or tile press: Bluetooth on, timer +1 step. Tile shows "On until HH:MM".
 - Timer ends: Bluetooth goes off if the phone is on the chosen Wi-Fi, otherwise it is left alone.
 - Switching Bluetooth off yourself during a timer ends the timer. "End timer now" does the same
   from the app.
-- Leaving the chosen Wi-Fi (option "Turn Bluetooth back on when I leave this Wi-Fi", on by
-  default): if the app switched Bluetooth off there, it is switched back on once the phone has
-  been on another Wi-Fi, or on no Wi-Fi, for 1 minute. Bluetooth you switched off yourself is
+- Leaving (option "Turn Bluetooth back on when I leave this Wi-Fi", on by default): if the app
+  switched Bluetooth off, it is switched back on once the phone has been on another Wi-Fi, or on
+  no Wi-Fi, for the leave wait (default 1 min). Bluetooth you switched off yourself is
   left off. On a Wi-Fi whose name Android hides, nothing happens.
-- Survives reboot. A low-priority notification is shown while watching; it can be hidden in the
+- The low-priority notification shown while watching says what the app is doing and has buttons:
+  "Bluetooth on N min" (or "+N min") and, while a timer runs, "End timer". It can be hidden in the
   notification settings.
+- Long-pressing the "BT timer" tile opens the app.
+- Survives reboot.
 
 ## Limits
 - Android 13+ only lets apps that target Android 12 or older switch Bluetooth. The app therefore

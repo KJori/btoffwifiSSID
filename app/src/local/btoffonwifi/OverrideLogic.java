@@ -5,10 +5,6 @@ final class OverrideLogic {
     static final long MAX_MS = 24L * 60 * 60 * 1000;
     /** A Bluetooth-off event this soon after a press is treated as a race, not as the user cancelling. */
     static final long PRESS_GRACE_MS = 5000;
-    /** How long the phone must be away from the chosen Wi-Fi before Bluetooth is turned back on,
-     *  so a router restart or a short drop-out does not count as leaving. */
-    static final long LEAVE_GRACE_MS = 60_000;
-
     /** Where the phone is relative to the chosen Wi-Fi. */
     static final int HOME = 0, AWAY = 1, UNKNOWN = 2;
 
@@ -37,10 +33,36 @@ final class OverrideLogic {
         return s;
     }
 
-    static boolean matches(String target, String current) {
-        if (target == null || current == null) return false;
-        String t = target.trim();
-        return !t.isEmpty() && t.equals(current.trim());
+    /** @param targets one or more Wi-Fi names, one per line */
+    static boolean matches(String targets, String current) {
+        if (targets == null || current == null) return false;
+        String cur = current.trim();
+        for (String t : targets.split("\n")) {
+            t = t.trim();
+            if (!t.isEmpty() && t.equals(cur)) return true;
+        }
+        return false;
+    }
+
+    /** The Wi-Fi names as a short readable list: "Home", "Home, Office". */
+    static String describe(String targets) {
+        StringBuilder sb = new StringBuilder();
+        if (targets != null) {
+            for (String t : targets.split("\n")) {
+                t = t.trim();
+                if (t.isEmpty()) continue;
+                if (sb.length() > 0) sb.append(", ");
+                sb.append('"').append(t).append('"');
+            }
+        }
+        return sb.toString();
+    }
+
+    /** Adds a name on its own line unless it is already in the list. */
+    static String addTarget(String targets, String name) {
+        if (name == null || name.trim().isEmpty() || matches(targets, name)) return targets == null ? "" : targets;
+        String t = targets == null ? "" : targets.trim();
+        return t.isEmpty() ? name.trim() : t + "\n" + name.trim();
     }
 
     /**
@@ -55,9 +77,9 @@ final class OverrideLogic {
         return UNKNOWN;
     }
 
-    /** True once the phone has been away for the whole grace period. */
-    static boolean awayLongEnough(long now, long awaySince) {
-        return awaySince > 0 && now - awaySince >= LEAVE_GRACE_MS;
+    /** True once a state that started at {@code since} (0 = not started) has lasted {@code ms}. */
+    static boolean waited(long now, long since, long ms) {
+        return since > 0 && now - since >= ms;
     }
 
     static String remaining(long now, long until) {
