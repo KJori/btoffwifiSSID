@@ -289,6 +289,7 @@ public class MainActivity extends Activity {
 
         String title, why;
         int circle;
+        int icon = on ? R.drawable.ic_bt_on : R.drawable.ic_bt_off;
         if (!Bt.available(this)) {
             title = "No Bluetooth";
             why = "This device has no Bluetooth to switch.";
@@ -301,23 +302,23 @@ public class MainActivity extends Activity {
             title = "Add your Wi-Fi";
             why = "Tell the app where Bluetooth should go off.";
             circle = R.color.warn;
+            icon = R.drawable.ic_wifi;
         } else if (next != 0 && next != STEP_BATTERY) {
             title = "Finish setup";
             why = "Android needs a few permissions first, see Setup below.";
             circle = R.color.warn;
         } else {
             title = on ? "Bluetooth is on" : "Bluetooth is off";
-            circle = on ? R.color.accent : R.color.neutral;
+            circle = R.color.accent;
             long offAt = Controller.pendingOffAt(this);
             long backAt = p.awaySince() + p.leaveGraceMin() * 60_000L;
             if (active) {
-                why = "Timer: on until " + Controller.clock(this, until)
-                        + " (" + OverrideLogic.remaining(now, until) + " left)";
+                why = "Timer: on until " + Controller.clock(this, until);
             } else if (audio != null) {
                 why = "Kept on for " + audio;
             } else if (offAt > 0) {
-                why = "Goes off at " + Controller.clock(this, offAt) + ", " + (offAt - now + 59_999) / 60_000
-                        + " min after arriving";
+                why = "Goes off at " + Controller.clock(this, offAt) + ", in "
+                        + OverrideLogic.remaining(now, offAt);
             } else if (home) {
                 why = on ? "On your Wi-Fi, but Android refused to switch it off. Check Setup."
                         : p.offByApp() ? "Switched off because you are home" : "Off, and you are home";
@@ -330,7 +331,7 @@ public class MainActivity extends Activity {
         }
         tvTitle.setText(title);
         tvStatus.setText(why);
-        imgStatus.setImageResource(on ? R.drawable.ic_bt_on : R.drawable.ic_bt_off);
+        imgStatus.setImageResource(icon);
         imgStatus.setImageTintList(ColorStateList.valueOf(getColor(R.color.card)));
         statusCircle.setBackgroundTintList(ColorStateList.valueOf(getColor(circle)));
         tvWifi.setText(cur != null ? "Wi-Fi: " + cur + (home ? " (one of yours)" : "")
@@ -343,7 +344,7 @@ public class MainActivity extends Activity {
         btnCancel.setEnabled(active);
         tvOverride.setText(active
                 ? "On until " + Controller.clock(this, until) + ", " + OverrideLogic.remaining(now, until) + " left"
-                : "Also at home. Press again for longer, up to 24 hours.");
+                : "Works at home too. Tap again for more, up to 24 h.");
         summary(rowStep, step);
 
         fillNetworks(cur);

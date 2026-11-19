@@ -111,6 +111,6 @@ final class OverrideLogic {
     static String remaining(long now, long until) {
         long min = (until - now + 59999) / 60000;
         if (min < 60) return min + " min";
-        return (min / 60) + " h " + (min % 60) + " min";
+        return min % 60 == 0 ? (min / 60) + " h" : (min / 60) + " h " + (min % 60) + " min";
     }
 }

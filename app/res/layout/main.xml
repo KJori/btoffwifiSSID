@@ -120,6 +120,25 @@
             </LinearLayout>
         </LinearLayout>
 
+        <!-- setup, only while something is missing -->
+        <LinearLayout
+            android:id="@+id/card_setup"
+            style="@style/Card">
+            <TextView style="@style/CardTitle" android:text="Setup" />
+            <LinearLayout
+                android:id="@+id/list_setup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="4dp" />
+            <Button
+                android:id="@+id/btn_setup"
+                style="@style/BtnFilled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp" />
+        </LinearLayout>
+
         <!-- timer -->
         <LinearLayout style="@style/Card">
             <TextView style="@style/CardTitle" android:text="Keep Bluetooth on" />
@@ -207,25 +226,6 @@
             <include android:id="@+id/row_restore" layout="@layout/row_setting" />
             <include android:id="@+id/row_leave" layout="@layout/row_setting" />
             <include android:id="@+id/row_audio" layout="@layout/row_setting" />
-        </LinearLayout>
-
-        <!-- setup, only while something is missing -->
-        <LinearLayout
-            android:id="@+id/card_setup"
-            style="@style/Card">
-            <TextView style="@style/CardTitle" android:text="Setup" />
-            <LinearLayout
-                android:id="@+id/list_setup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="4dp" />
-            <Button
-                android:id="@+id/btn_setup"
-                style="@style/BtnFilled"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp" />
         </LinearLayout>
 
         <!-- extras -->
