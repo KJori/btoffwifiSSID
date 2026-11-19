@@ -24,13 +24,17 @@ else
 fi
 cd "$SITE"
 
-if [ -e "repo/${APP}_${VC}.apk" ]; then
-    echo "versionCode $VC is already in the F-Droid repo"
+# Inputs: the APK for this versionCode (added once), metadata and icons (kept in sync).
+mkdir -p repo/icons "metadata/$APP/en-US"
+[ -e "repo/${APP}_${VC}.apk" ] || cp "$ROOT/BtOffOnWifi.apk" "repo/${APP}_${VC}.apk"
+cp "$ROOT/fdroid/$APP.yml" "metadata/$APP.yml"
+cp "$ROOT/fdroid/icon.png" "metadata/$APP/en-US/icon.png"   # app icon
+cp "$ROOT/fdroid/icon.png" repo/icons/icon.png               # repo icon
+if git rev-parse -q --verify HEAD > /dev/null \
+        && [ -z "$(git status --porcelain -- repo/*.apk repo/icons/icon.png metadata)" ]; then
+    echo "F-Droid repo is up to date (versionCode $VC, same metadata and icons)"
     exit 0
 fi
-mkdir -p repo metadata
-cp "$ROOT/BtOffOnWifi.apk" "repo/${APP}_${VC}.apk"
-cp "$ROOT/fdroid/$APP.yml" "metadata/$APP.yml"
 
 if [ -n "${FDROID_KEYSTORE_B64:-}" ]; then
     echo "$FDROID_KEYSTORE_B64" | base64 -d > "$TMP/repo.p12"
@@ -47,6 +51,7 @@ repo_name: KJori apps
 repo_description: >-
   Apps built and signed by GitHub Actions from https://github.com/KJori/btoffwifiSSID
 archive_older: 0
+repo_icon: icon.png
 keystore: $TMP/repo.p12
 repo_keyalias: fdroidrepo
 keystorepass: $PASS
@@ -64,7 +69,7 @@ grep -q "\"$APP\"" repo/index-v2.json || { echo "::error::$APP missing from inde
 
 git add repo metadata
 git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
-    commit -q -m "F-Droid repo: add $APP versionCode $VC"
+    commit -q -m "F-Droid repo: $APP versionCode $VC"
 if [ "${PUBLISH:-no}" = "yes" ]; then
     git push -q origin HEAD:refs/heads/fdroid
     echo "Published versionCode $VC to the fdroid branch"
