@@ -1,0 +1,20 @@
+Categories:
+  - Connectivity
+License: Unknown
+SourceCode: https://github.com/KJori/btoffwifiSSID
+IssueTracker: https://github.com/KJori/btoffwifiSSID/issues
+
+AutoName: BT Off on Wi-Fi
+Name: BT Off on Wi-Fi
+Summary: Turns Bluetooth off on your home Wi-Fi and back on when you leave
+Description: |-
+  Switches Bluetooth off while the phone is on one of your chosen Wi-Fi networks,
+  and (optionally) back on once you have left.
+
+  * Several Wi-Fi names; adjustable delay after arriving (default 5 min) and after leaving (default 1 min)
+  * Stays on while earbuds or a headset are connected; watches and other low-energy devices do not count
+  * "Keep Bluetooth on" timer from the app, a quick settings tile or the notification
+  * No internet permission
+
+  Android 13+ only lets apps that target Android 12 switch Bluetooth, so this app targets API 31 on purpose.
+  Location ("Allow all the time") is needed because Android only reveals the Wi-Fi name to apps with it.

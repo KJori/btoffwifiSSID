@@ -1,0 +1,112 @@
+{
+  "repo": {
+    "name": {
+      "en-US": "KJori apps"
+    },
+    "description": {
+      "en-US": "Apps built and signed by GitHub Actions from https://github.com/KJori/btoffwifiSSID"
+    },
+    "icon": {
+      "en-US": {
+        "name": "/icons/icon.png",
+        "sha256": "5e13443364836be26a7c6a9a37f6ef6bd2c954277e42d49e7d659214cc6ab9f8",
+        "size": 918
+      }
+    },
+    "address": "https://raw.githubusercontent.com/KJori/btoffwifiSSID/fdroid/repo",
+    "timestamp": 1795106752000,
+    "categories": {
+      "Connectivity": {
+        "name": {
+          "en-US": "Connectivity"
+        }
+      }
+    }
+  },
+  "packages": {
+    "local.btoffonwifi": {
+      "metadata": {
+        "added": 1795106752000,
+        "categories": [
+          "Connectivity"
+        ],
+        "issueTracker": "https://github.com/KJori/btoffwifiSSID/issues",
+        "lastUpdated": 1795106752000,
+        "sourceCode": "https://github.com/KJori/btoffwifiSSID",
+        "name": {
+          "en-US": "BT Off on Wi-Fi"
+        },
+        "summary": {
+          "en-US": "Turns Bluetooth off on your home Wi-Fi and back on when you leave"
+        },
+        "description": {
+          "en-US": "Switches Bluetooth off while the phone is on one of your chosen Wi-Fi networks,\nand (optionally) back on once you have left.\n\n* Several Wi-Fi names; adjustable delay after arriving (default 5 min) and after leaving (default 1 min)\n* Stays on while earbuds or a headset are connected; watches and other low-energy devices do not count\n* \"Keep Bluetooth on\" timer from the app, a quick settings tile or the notification\n* No internet permission\n\nAndroid 13+ only lets apps that target Android 12 switch Bluetooth, so this app targets API 31 on purpose.\nLocation (\"Allow all the time\") is needed because Android only reveals the Wi-Fi name to apps with it."
+        },
+        "preferredSigner": "4d2aabcc4dfb19fad8ca5a6fd2a7ee55c77990e145ffae2acba00b60643be220"
+      },
+      "versions": {
+        "4d245f301dbc215e05daedf129a39aea26503a730b632ddfc7ec486ca7099523": {
+          "added": 1795106752000,
+          "file": {
+            "name": "/local.btoffonwifi_3.apk",
+            "sha256": "4d245f301dbc215e05daedf129a39aea26503a730b632ddfc7ec486ca7099523",
+            "size": 37650
+          },
+          "manifest": {
+            "versionName": "1.2",
+            "versionCode": 3,
+            "usesSdk": {
+              "minSdkVersion": 24,
+              "targetSdkVersion": 31
+            },
+            "signer": {
+              "sha256": [
+                "4d2aabcc4dfb19fad8ca5a6fd2a7ee55c77990e145ffae2acba00b60643be220"
+              ]
+            },
+            "usesPermission": [
+              {
+                "name": "android.permission.BLUETOOTH",
+                "maxSdkVersion": 30
+              },
+              {
+                "name": "android.permission.BLUETOOTH_ADMIN",
+                "maxSdkVersion": 30
+              },
+              {
+                "name": "android.permission.BLUETOOTH_CONNECT"
+              },
+              {
+                "name": "android.permission.ACCESS_WIFI_STATE"
+              },
+              {
+                "name": "android.permission.ACCESS_NETWORK_STATE"
+              },
+              {
+                "name": "android.permission.ACCESS_COARSE_LOCATION"
+              },
+              {
+                "name": "android.permission.ACCESS_FINE_LOCATION"
+              },
+              {
+                "name": "android.permission.ACCESS_BACKGROUND_LOCATION"
+              },
+              {
+                "name": "android.permission.FOREGROUND_SERVICE"
+              },
+              {
+                "name": "android.permission.RECEIVE_BOOT_COMPLETED"
+              },
+              {
+                "name": "android.permission.SCHEDULE_EXACT_ALARM"
+              },
+              {
+                "name": "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
