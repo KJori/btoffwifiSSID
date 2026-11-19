@@ -5,6 +5,12 @@ final class OverrideLogic {
     static final long MAX_MS = 24L * 60 * 60 * 1000;
     /** A Bluetooth-off event this soon after a press is treated as a race, not as the user cancelling. */
     static final long PRESS_GRACE_MS = 5000;
+    /** How long the phone must be away from the chosen Wi-Fi before Bluetooth is turned back on,
+     *  so a router restart or a short drop-out does not count as leaving. */
+    static final long LEAVE_GRACE_MS = 60_000;
+
+    /** Where the phone is relative to the chosen Wi-Fi. */
+    static final int HOME = 0, AWAY = 1, UNKNOWN = 2;
 
     private OverrideLogic() {}
 
@@ -35,6 +41,23 @@ final class OverrideLogic {
         if (target == null || current == null) return false;
         String t = target.trim();
         return !t.isEmpty() && t.equals(current.trim());
+    }
+
+    /**
+     * @param currentSsid   normalized SSID, or null if not connected or Android hides it
+     * @param wifiConnected whether any Wi-Fi network is connected
+     * @return HOME on the chosen Wi-Fi; AWAY on another named Wi-Fi or on no Wi-Fi at all;
+     *         UNKNOWN on a Wi-Fi whose name Android will not reveal (never treated as leaving)
+     */
+    static int place(String target, String currentSsid, boolean wifiConnected) {
+        if (matches(target, currentSsid)) return HOME;
+        if (currentSsid != null || !wifiConnected) return AWAY;
+        return UNKNOWN;
+    }
+
+    /** True once the phone has been away for the whole grace period. */
+    static boolean awayLongEnough(long now, long awaySince) {
+        return awaySince > 0 && now - awaySince >= LEAVE_GRACE_MS;
     }
 
     static String remaining(long now, long until) {

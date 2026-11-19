@@ -81,6 +81,14 @@ public class MainActivity extends Activity {
             refresh();
         });
 
+        Switch swRestore = findViewById(R.id.sw_restore);
+        swRestore.setChecked(p.restoreOnLeave());
+        swRestore.setOnCheckedChangeListener((v, on) -> {
+            p.setRestoreOnLeave(on);
+            Controller.evaluate(this, null);
+            refresh();
+        });
+
         edSsid.setText(p.ssid());
         edSsid.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
@@ -162,7 +170,8 @@ public class MainActivity extends Activity {
                 : Wifi.wifiConnected(this) ? "connected, name hidden by Android (see Setup)" : "not connected";
         boolean match = OverrideLogic.matches(p.ssid(), ssid);
         tvStatus.setText("Wi-Fi now: " + wifi + (match ? "  (match)" : "")
-                + "\nBluetooth: " + (!Bt.available(this) ? "not available" : Bt.isOn(this) ? "on" : "off")
+                + "\nBluetooth: " + (!Bt.available(this) ? "not available" : Bt.isOn(this) ? "on"
+                        : p.offByApp() ? "off (switched off by this app)" : "off")
                 + "\nWatcher: " + (!p.enabled() ? "switched off" : GuardService.running ? "running" : "starting"));
 
         btnOverride.setText(active ? "Keep Bluetooth on  +" + label(p.stepMinutes())

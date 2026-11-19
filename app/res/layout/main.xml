@@ -39,6 +39,20 @@
             android:layout_height="wrap_content"
             android:text="Use current Wi-Fi" />
 
+        <Switch
+            android:id="@+id/sw_restore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:minHeight="48dp"
+            android:text="Turn Bluetooth back on when I leave this Wi-Fi" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Only if this app switched it off. Waits 1 minute away first, so a Wi-Fi drop-out does not count."
+            android:textSize="12sp" />
+
         <TextView
             android:id="@+id/tv_status"
             android:layout_width="match_parent"

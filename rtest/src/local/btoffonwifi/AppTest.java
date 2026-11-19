@@ -128,6 +128,129 @@ public class AppTest {
         assertTrue("no ssid configured", bt.isEnabled());
     }
 
+    // ---- turning Bluetooth back on after leaving ----
+
+    private void offAtHome() {
+        watch("Home");
+        onWifi("Home");
+        bt.enable();
+        Controller.evaluate(app, null);
+        assertFalse(bt.isEnabled());
+        assertTrue("app remembers it switched bt off", p.offByApp());
+    }
+
+    @Test
+    public void placeAndGraceLogic() {
+        assertEquals(OverrideLogic.HOME, OverrideLogic.place("Home", "Home", true));
+        assertEquals(OverrideLogic.AWAY, OverrideLogic.place("Home", "Office", true));
+        assertEquals(OverrideLogic.AWAY, OverrideLogic.place("Home", null, false));
+        assertEquals("hidden name is not leaving", OverrideLogic.UNKNOWN, OverrideLogic.place("Home", null, true));
+        assertFalse(OverrideLogic.awayLongEnough(100_000, 0));
+        assertFalse(OverrideLogic.awayLongEnough(100_000, 100_000 - OverrideLogic.LEAVE_GRACE_MS + 1));
+        assertTrue(OverrideLogic.awayLongEnough(100_000, 100_000 - OverrideLogic.LEAVE_GRACE_MS));
+    }
+
+    @Test
+    public void leavingTurnsBluetoothBackOnAfterGrace() {
+        offAtHome();
+        onWifi("Office");
+        Controller.evaluate(app, null);
+        assertFalse("not yet: inside the grace period", bt.isEnabled());
+        assertTrue(p.awaySince() > 0);
+        AlarmManager am = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
+        ShadowAlarmManager.ScheduledAlarm alarm = shadowOf(am).getNextScheduledAlarm();
+        assertNotNull("re-check scheduled", alarm);
+        assertEquals(p.awaySince() + OverrideLogic.LEAVE_GRACE_MS, alarm.triggerAtTime);
+
+        // the harness cannot move the clock, so move the stored start of "away" instead
+        p.setAwaySince(System.currentTimeMillis() - OverrideLogic.LEAVE_GRACE_MS - 1000);
+        new AlarmReceiver().onReceive(app, shadowOf(alarm.operation).getSavedIntent());
+        assertTrue("bt back on after leaving", bt.isEnabled());
+        assertFalse(p.offByApp());
+        assertTrue(p.lastEvent(), p.lastEvent().contains("back on"));
+
+        onWifi("Home");
+        Controller.evaluate(app, null);
+        assertFalse("off again at home", bt.isEnabled());
+        assertEquals("away timer reset at home", 0, p.awaySince());
+    }
+
+    @Test
+    public void shortDropOutDoesNotTurnBluetoothOn() {
+        offAtHome();
+        onWifi("Office");
+        Controller.evaluate(app, null);
+        onWifi("Home"); // back within the minute
+        Controller.evaluate(app, null);
+        assertEquals(0, p.awaySince());
+        assertFalse(bt.isEnabled());
+        assertTrue("still remembered for a real departure", p.offByApp());
+    }
+
+    @Test
+    public void optionOffLeavesBluetoothOff() {
+        offAtHome();
+        p.setRestoreOnLeave(false);
+        onWifi("Office");
+        p.setAwaySince(System.currentTimeMillis() - OverrideLogic.LEAVE_GRACE_MS - 1000);
+        Controller.evaluate(app, null);
+        assertFalse(bt.isEnabled());
+    }
+
+    @Test
+    public void bluetoothTheUserSwitchedOffStaysOff() {
+        watch("Home");
+        onWifi("Home");
+        Controller.evaluate(app, null); // bt already off: app did nothing
+        assertFalse(p.offByApp());
+        onWifi("Office");
+        p.setAwaySince(System.currentTimeMillis() - OverrideLogic.LEAVE_GRACE_MS - 1000);
+        Controller.evaluate(app, null);
+        assertFalse("user's own off is respected", bt.isEnabled());
+    }
+
+    @Test
+    public void hiddenWifiNameIsNotLeaving() {
+        offAtHome();
+        onWifi(null);
+        p.setAwaySince(System.currentTimeMillis() - OverrideLogic.LEAVE_GRACE_MS - 1000);
+        if (Wifi.wifiConnected(app)) {
+            Controller.evaluate(app, null);
+            assertFalse(bt.isEnabled());
+        }
+    }
+
+    @Test
+    public void bluetoothOnFromElsewhereForgetsOffByApp() {
+        offAtHome();
+        Controller.onBluetoothState(app, BluetoothAdapter.STATE_ON); // e.g. user, or the timer
+        assertFalse(p.offByApp());
+    }
+
+    @Test
+    public void switchingFeatureOffForgetsOffByApp() {
+        offAtHome();
+        Controller.stopWatching(app);
+        assertFalse(p.offByApp());
+        assertEquals(0, p.awaySince());
+    }
+
+    @Test
+    public void lostNetworkCallbackLeadsToRestore() {
+        offAtHome();
+        ServiceController<GuardService> sc = Robolectric.buildService(GuardService.class).create().startCommand(0, 1);
+        ConnectivityManager cm = (ConnectivityManager) app.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager.NetworkCallback cb = shadowOf(cm).getNetworkCallbacks().iterator().next();
+        onWifi("Office");
+        cb.onLost(cm.getActiveNetwork());
+        AlarmManager am = (AlarmManager) app.getSystemService(Context.ALARM_SERVICE);
+        assertNotNull("re-check scheduled after loss", shadowOf(am).getNextScheduledAlarm());
+        p.setAwaySince(System.currentTimeMillis() - OverrideLogic.LEAVE_GRACE_MS - 1000);
+        new AlarmReceiver().onReceive(app, new Intent());
+        assertTrue(bt.isEnabled());
+        sc.destroy();
+    }
+
     // ---- the timer ----
 
     @Test
@@ -315,6 +438,12 @@ public class AppTest {
 
         assertEquals("Home", ((EditText) a.findViewById(R.id.ed_ssid)).getText().toString());
         assertTrue(((Switch) a.findViewById(R.id.sw_enabled)).isChecked());
+        Switch restore = a.findViewById(R.id.sw_restore);
+        assertTrue("restore option on by default", restore.isChecked());
+        restore.performClick();
+        assertFalse(p.restoreOnLeave());
+        restore.performClick();
+        assertTrue(p.restoreOnLeave());
         String status = ((TextView) a.findViewById(R.id.tv_status)).getText().toString();
         assertTrue(status, status.contains("\"Home\"") && status.contains("(match)") && status.contains("Bluetooth: off"));
         assertEquals(View.VISIBLE, a.findViewById(R.id.btn_tile).getVisibility());

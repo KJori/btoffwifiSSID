@@ -149,6 +149,7 @@ public class GuardService extends Service {
         @Override
         public void onLost(Network network) {
             Wifi.lost(network);
+            Controller.onWifiLost(GuardService.this);
         }
     }
 
