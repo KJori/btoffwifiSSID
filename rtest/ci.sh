@@ -8,6 +8,11 @@ SDK="${ANDROID_SDK_ROOT:-$ROOT/sdk}"
 PLAT="$SDK/platforms/android-34/android.jar"
 
 mvn -q -B dependency:copy-dependencies -DoutputDirectory=lib || exit 2
+# Some dependencies (androidx.test) are Android .aar archives: put their classes.jar on the path.
+for aar in lib/*.aar; do
+    [ -e "$aar" ] || continue
+    unzip -p "$aar" classes.jar > "${aar%.aar}.jar"
+done
 
 # Point Robolectric at the manifest and the resources compiled by build.sh.
 mkdir -p cfg/com/android/tools
@@ -24,6 +29,8 @@ java -Xmx2g -cp "tc:$CP:$PLAT" org.junit.runner.JUnitCore local.btoffonwifi.AppT
 status=$?
 
 grep -E '^(OK \(|Tests run:)' test_out.txt
+# Full trace of the first failure, for the log.
+awk '/^1\) /{p=1} /^2\) /{exit} p' test_out.txt | head -40
 # Each failure as a GitHub annotation, so it shows on the run page.
 grep -A2 -E '^[0-9]+\) ' test_out.txt | grep -v '^--$' | paste - - - | while IFS= read -r line; do
     echo "::error title=Test failure::$line"
