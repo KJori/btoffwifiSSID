@@ -60,8 +60,11 @@ keydname: CN=KJori F-Droid repo
 sdk_path: ${ANDROID_HOME:-$ROOT/sdk}
 EOF
 chmod 600 config.yml
+# fdroidserver releases differ on where repo_icon is looked up: repo/icons/ or the working folder.
+cp repo/icons/icon.png icon.png
+echo "fdroidserver $(pip show fdroidserver 2>/dev/null | sed -n 's/^Version: //p')"
 fdroid update --pretty
-rm -f config.yml
+rm -f config.yml icon.png
 
 echo "Repository contents:"
 ls repo
