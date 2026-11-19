@@ -1,6 +1,6 @@
 {
   "repo": {
-    "timestamp": 1795113201000,
+    "timestamp": 1795120014000,
     "version": 20002,
     "name": "KJori apps",
     "icon": "icon.png",
@@ -28,7 +28,14 @@
       "lastUpdated": 1795113201000,
       "localized": {
         "en-US": {
-          "icon": "icon_8JGfjeKmKN28GEHcCd5mFN_zFPOE56upNWWljWY3xJ0=.png"
+          "icon": "icon_8JGfjeKmKN28GEHcCd5mFN_zFPOE56upNWWljWY3xJ0=.png",
+          "phoneScreenshots": [
+            "1_home_light.png",
+            "2_home_dark.png",
+            "3_timer_light.png",
+            "4_arriving_dark.png",
+            "5_setup_light.png"
+          ]
         }
       }
     }

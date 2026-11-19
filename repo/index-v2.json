@@ -14,7 +14,7 @@
       }
     },
     "address": "https://raw.githubusercontent.com/KJori/btoffwifiSSID/fdroid/repo",
-    "timestamp": 1795113201000,
+    "timestamp": 1795120014000,
     "categories": {
       "Connectivity": {
         "name": {
@@ -33,6 +33,37 @@
         "issueTracker": "https://github.com/KJori/btoffwifiSSID/issues",
         "lastUpdated": 1795113201000,
         "sourceCode": "https://github.com/KJori/btoffwifiSSID",
+        "screenshots": {
+          "phone": {
+            "en-US": [
+              {
+                "name": "/local.btoffonwifi/en-US/phoneScreenshots/1_home_light.png",
+                "sha256": "28599276e496257718f7038125b0cc9bb7ce54d4740621bf56b114f828b8d1b1",
+                "size": 175849
+              },
+              {
+                "name": "/local.btoffonwifi/en-US/phoneScreenshots/2_home_dark.png",
+                "sha256": "beeff213fe9e5d8bb7af0b788ba7acc6f90a7a51301b4ebc244574f478e03c55",
+                "size": 192969
+              },
+              {
+                "name": "/local.btoffonwifi/en-US/phoneScreenshots/3_timer_light.png",
+                "sha256": "cf1e6a4da12cf557cf3bf462f113dd5f3a513eb446efbbfec1930ef68f1d988d",
+                "size": 146504
+              },
+              {
+                "name": "/local.btoffonwifi/en-US/phoneScreenshots/4_arriving_dark.png",
+                "sha256": "e509b5c374fd865a8f77d1dcc9d70fff9ff888f214b4e5d230e10e1a5211d7e6",
+                "size": 189400
+              },
+              {
+                "name": "/local.btoffonwifi/en-US/phoneScreenshots/5_setup_light.png",
+                "sha256": "6ff1c3f44758eb017d985e2a4d3deaa8d4ab8e4cc929e557dae0e0deed3855c2",
+                "size": 181682
+              }
+            ]
+          }
+        },
         "name": {
           "en-US": "BT Off on Wi-Fi"
         },

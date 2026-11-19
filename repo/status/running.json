@@ -8,7 +8,7 @@
     "--pretty"
   ],
   "disabled": [],
-  "endTimestamp": 1795113204896,
+  "endTimestamp": 1795120017399,
   "failedBuilds": {},
   "jarsigner": "/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.21-9/x64/bin/jarsigner",
   "keytool": "/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.21-9/x64/bin/keytool",
@@ -22,14 +22,14 @@
     "local.btoffonwifi"
   ],
   "stages": {
-    "delete_disabled_builds": 1795113200643,
-    "index.make repo": 1795113201741,
-    "prepare_apps repo": 1795113201696,
-    "process_apks": 1795113200643,
-    "read_added_date_from_all_apks": 1795113201696,
-    "remove_apks": 1795113201695,
-    "scan_repo_files": 1795113201694
+    "delete_disabled_builds": 1795120013163,
+    "index.make repo": 1795120014712,
+    "prepare_apps repo": 1795120014211,
+    "process_apks": 1795120013205,
+    "read_added_date_from_all_apks": 1795120014211,
+    "remove_apks": 1795120014210,
+    "scan_repo_files": 1795120014210
   },
-  "startTimestamp": 1795113200000,
+  "startTimestamp": 1795120013000,
   "subcommand": "update"
 }
