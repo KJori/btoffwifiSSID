@@ -11,6 +11,8 @@ import android.app.job.JobScheduler;
 import android.app.NotificationManager;
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothClass;
+import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
 import android.content.ComponentName;
@@ -20,6 +22,7 @@ import android.net.ConnectivityManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Parcel;
 import android.service.quicksettings.Tile;
 import android.view.View;
 import android.widget.Button;
@@ -38,6 +41,8 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.android.controller.ServiceController;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadow.api.Shadow;
+import org.robolectric.shadows.ShadowBluetoothA2dp;
 import org.robolectric.shadows.ShadowAlarmManager;
 import org.robolectric.shadows.ShadowLooper;
 import org.robolectric.shadows.ShadowSystemClock;
@@ -66,6 +71,40 @@ public class AppTest {
         assertNotNull("adapter", bt);
         p = new Prefs(app);
         p.setArriveDelayMin(0); // most tests check the rule itself; the delay has its own tests
+        Bt.resetProfiles();
+        a2dpProxy = null;
+    }
+
+    // ---- simulated Bluetooth devices ----
+
+    private BluetoothA2dp a2dpProxy;
+
+    /** The media-audio proxy the app binds to; devices added here count as connected for A2DP. */
+    private ShadowBluetoothA2dp a2dp() {
+        if (a2dpProxy == null) {
+            a2dpProxy = Shadow.newInstanceOf(BluetoothA2dp.class);
+            shadowOf(bt).setProfileProxy(BluetoothProfile.A2DP, a2dpProxy);
+        }
+        return Shadow.extract(a2dpProxy);
+    }
+
+    private BluetoothDevice device(String mac, String name, int deviceClass) {
+        BluetoothDevice d = bt.getRemoteDevice(mac);
+        Parcel parcel = Parcel.obtain();
+        parcel.writeInt(deviceClass);
+        parcel.setDataPosition(0);
+        shadowOf(d).setBluetoothClass(BluetoothClass.CREATOR.createFromParcel(parcel));
+        parcel.recycle();
+        shadowOf(d).setName(name);
+        return d;
+    }
+
+    private BluetoothDevice earbuds() {
+        return device("00:11:22:33:44:01", "Pixel Buds", BluetoothClass.Device.AUDIO_VIDEO_WEARABLE_HEADSET);
+    }
+
+    private BluetoothDevice watch() {
+        return device("00:11:22:33:44:02", "Galaxy Watch", BluetoothClass.Device.WEARABLE_WRIST_WATCH);
     }
 
     private void onWifi(String ssid) {
@@ -316,22 +355,83 @@ public class AppTest {
         watch("Home");
         onWifi("Home");
         bt.enable();
-        shadowOf(bt).setProfileConnectionState(BluetoothProfile.A2DP, BluetoothProfile.STATE_CONNECTED);
+        BluetoothDevice buds = earbuds();
+        a2dp().addDevice(buds, BluetoothProfile.STATE_CONNECTED);
         Controller.evaluate(app, null);
         assertTrue("earbuds connected: stays on", bt.isEnabled());
-        shadowOf(bt).setProfileConnectionState(BluetoothProfile.A2DP, BluetoothProfile.STATE_DISCONNECTED);
+        assertEquals("Pixel Buds", Bt.connectedAudio(app));
+        a2dp().removeDevice(buds);
         Controller.onAudioState(app, BluetoothProfile.STATE_DISCONNECTED);
         assertFalse("off once they disconnect", bt.isEnabled());
     }
 
     @Test
-    public void headsetKeepsBluetoothOn() {
+    public void watchConnectedForCallsDoesNotKeepBluetoothOn() {
+        // The reported bug: a watch that takes calls connects as a hands-free device.
+        watch("Home");
+        onWifi("Home");
+        bt.enable();
+        watch();
+        shadowOf(bt).setProfileConnectionState(BluetoothProfile.HEADSET, BluetoothProfile.STATE_CONNECTED);
+        a2dp(); // proxy bound, no media-audio devices
+        Controller.evaluate(app, null);
+        assertNull(Bt.connectedAudio(app));
+        assertFalse("watch on hands-free: off", bt.isEnabled());
+    }
+
+    @Test
+    public void watchOnHandsFreeDoesNotCountBeforeProxyIsBound() {
         watch("Home");
         onWifi("Home");
         bt.enable();
         shadowOf(bt).setProfileConnectionState(BluetoothProfile.HEADSET, BluetoothProfile.STATE_CONNECTED);
         Controller.evaluate(app, null);
+        assertFalse("fallback ignores hands-free", bt.isEnabled());
+    }
+
+    @Test
+    public void watchStreamingMediaStillDoesNotCount() {
+        watch("Home");
+        onWifi("Home");
+        bt.enable();
+        a2dp().addDevice(watch(), BluetoothProfile.STATE_CONNECTED);
+        Controller.evaluate(app, null);
+        assertFalse("a wearable never keeps it on", bt.isEnabled());
+    }
+
+    @Test
+    public void earbudsCountNextToAWatch() {
+        watch("Home");
+        onWifi("Home");
+        bt.enable();
+        a2dp().addDevice(watch(), BluetoothProfile.STATE_CONNECTED);
+        a2dp().addDevice(earbuds(), BluetoothProfile.STATE_CONNECTED);
+        Controller.evaluate(app, null);
         assertTrue(bt.isEnabled());
+        assertEquals("Pixel Buds", Bt.connectedAudio(app));
+    }
+
+    @Test
+    public void mediaAudioCountsBeforeProxyIsBound() {
+        watch("Home");
+        onWifi("Home");
+        bt.enable();
+        shadowOf(bt).setProfileConnectionState(BluetoothProfile.A2DP, BluetoothProfile.STATE_CONNECTED);
+        Controller.evaluate(app, null);
+        assertTrue("fallback: media audio connected keeps it on", bt.isEnabled());
+    }
+
+    @Test
+    public void statusNamesTheDeviceKeepingBluetoothOn() {
+        watch("Home");
+        onWifi("Home");
+        bt.enable();
+        a2dp().addDevice(earbuds(), BluetoothProfile.STATE_CONNECTED);
+        ActivityController<MainActivity> ac = Robolectric.buildActivity(MainActivity.class).setup();
+        idle();
+        String status = ((TextView) ac.get().findViewById(R.id.tv_status)).getText().toString();
+        assertTrue(status, status.contains("Pixel Buds connected"));
+        ac.pause().stop().destroy();
     }
 
     @Test
@@ -349,12 +449,13 @@ public class AppTest {
     public void earbudsDisconnectBroadcastReachesService() {
         watch("Home");
         onWifi("Home");
+        BluetoothDevice buds = earbuds();
+        a2dp().addDevice(buds, BluetoothProfile.STATE_CONNECTED);
         ServiceController<GuardService> sc = Robolectric.buildService(GuardService.class).create().startCommand(0, 1);
         bt.enable();
-        shadowOf(bt).setProfileConnectionState(BluetoothProfile.A2DP, BluetoothProfile.STATE_CONNECTED);
         Controller.evaluate(app, null);
         assertTrue(bt.isEnabled());
-        shadowOf(bt).setProfileConnectionState(BluetoothProfile.A2DP, BluetoothProfile.STATE_DISCONNECTED);
+        a2dp().removeDevice(buds);
         app.sendBroadcast(new Intent(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED)
                 .putExtra(BluetoothProfile.EXTRA_STATE, BluetoothProfile.STATE_DISCONNECTED));
         idle();

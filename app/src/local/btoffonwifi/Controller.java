@@ -30,8 +30,8 @@ final class Controller {
 
     /**
      * The rule: if watching is enabled, no timer is running and the phone has been on one of the
-     * chosen Wi-Fi networks for the arrival delay, Bluetooth goes off - unless earbuds or a
-     * headset are connected (optional). Optionally, once the phone has been away for the leave
+     * chosen Wi-Fi networks for the arrival delay, Bluetooth goes off - unless earbuds,
+     * headphones or a speaker are connected (optional; watches never count). Optionally, once the phone has been away for the leave
      * delay, Bluetooth that this app switched off goes back on.
      *
      * @param knownSsid SSID just delivered by a network callback, or null to look it up
@@ -115,7 +115,7 @@ final class Controller {
         evaluate(c, null);
     }
 
-    /** Earbuds or a headset connected or disconnected. */
+    /** Earbuds, headphones or a speaker connected or disconnected (media audio). */
     static void onAudioState(Context c, int state) {
         if (state != BluetoothProfile.STATE_DISCONNECTED) return;
         Prefs p = new Prefs(c);

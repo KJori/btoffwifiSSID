@@ -243,7 +243,8 @@ public class MainActivity extends Activity {
     private String btStatus() {
         if (!Bt.available(this)) return "not available";
         if (!Bt.isOn(this)) return p.offByApp() ? "off (switched off by this app)" : "off";
-        if (p.keepForAudio() && Bt.audioConnected(this)) return "on (earbuds or headset connected)";
+        String audio = p.keepForAudio() ? Bt.connectedAudio(this) : null;
+        if (audio != null) return "on (kept on: " + audio + " connected)";
         long offAt = Controller.pendingOffAt(this);
         return offAt > 0 ? "on, goes off at " + Controller.clock(this, offAt) : "on";
     }

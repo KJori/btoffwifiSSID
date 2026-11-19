@@ -35,7 +35,7 @@ final class Prefs {
     boolean offByApp() { return sp.getBoolean("offByApp", false); }
     void setOffByApp(boolean v) { sp.edit().putBoolean("offByApp", v).apply(); }
 
-    /** Do not switch Bluetooth off while earbuds or a headset (A2DP/HFP) are connected. */
+    /** Do not switch Bluetooth off while earbuds, headphones or a speaker (media audio) are connected. */
     boolean keepForAudio() { return sp.getBoolean("keepForAudio", true); }
     void setKeepForAudio(boolean v) { sp.edit().putBoolean("keepForAudio", v).apply(); }
 

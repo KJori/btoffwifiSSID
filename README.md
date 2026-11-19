@@ -4,7 +4,7 @@ Turns Bluetooth off while the phone is connected to one of your chosen Wi-Fi net
 A timer keeps Bluetooth on temporarily; each press of the app button or the quick-settings
 tile ("BT timer") adds one step (15 min / 30 min / 1 h / 2 h, selectable), up to 24 h.
 
-Package `local.btoffonwifi`, version 1.2. Android 7.0 or newer. No internet permission.
+Package `local.btoffonwifi`, version 1.3. Android 7.0 or newer. No internet permission.
 
 ## Install
 1. Copy `BtOffOnWifi.apk` to the phone and open it. Allow "install unknown apps" when asked.
@@ -18,8 +18,10 @@ Package `local.btoffonwifi`, version 1.2. Android 7.0 or newer. No internet perm
 - On a chosen Wi-Fi, no timer running: Bluetooth is switched off once the phone has been there for
   the arrival delay ("Switch off after arriving", default 5 min; "immediately" is an option). If
   Bluetooth is switched on from the system toggle in that state, it is switched off again.
-- Earbuds or a headset connected (classic Bluetooth audio, A2DP or hands-free): Bluetooth stays on
-  until they disconnect. Watches and other low-energy devices do not count. Can be switched off.
+- Earbuds, headphones or a speaker connected for media audio (A2DP, and the device reports itself
+  as an audio device): Bluetooth stays on until they disconnect. Watches never count, also not
+  ones that take calls (they connect as a hands-free device, like a headset does for calls).
+  Can be switched off. The status line names the device that keeps Bluetooth on.
 - Button or tile press: Bluetooth on, timer +1 step. Tile shows "On until HH:MM".
 - Timer ends: Bluetooth goes off if the phone is on the chosen Wi-Fi, otherwise it is left alone.
 - Switching Bluetooth off yourself during a timer ends the timer. "End timer now" does the same

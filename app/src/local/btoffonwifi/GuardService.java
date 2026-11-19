@@ -7,7 +7,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothA2dp;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothHeadset;
 import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -39,6 +38,7 @@ public class GuardService extends Service {
         running = true;
         if (!goForeground()) return;
 
+        Bt.bindProfiles(this);
         cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         callback = Build.VERSION.SDK_INT >= 31
                 ? new WifiCallback(ConnectivityManager.NetworkCallback.FLAG_INCLUDE_LOCATION_INFO)
@@ -59,14 +59,13 @@ public class GuardService extends Service {
                 if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
                     Controller.onBluetoothState(c, i.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1));
                 } else {
-                    // earbuds / headset (A2DP or hands-free) connected or disconnected
+                    // earbuds / headphones (media audio) connected or disconnected
                     Controller.onAudioState(c, i.getIntExtra(BluetoothProfile.EXTRA_STATE, -1));
                 }
             }
         };
         IntentFilter f = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         f.addAction(BluetoothA2dp.ACTION_CONNECTION_STATE_CHANGED);
-        f.addAction(BluetoothHeadset.ACTION_CONNECTION_STATE_CHANGED);
         registerReceiver(btReceiver, f);
     }
 

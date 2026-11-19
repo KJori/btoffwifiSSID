@@ -62,12 +62,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:minHeight="48dp"
-            android:text="Keep Bluetooth on while earbuds or a headset are connected" />
+            android:text="Keep Bluetooth on while earbuds or headphones are connected" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Audio devices only. Watches and other low-energy devices do not keep it on."
+            android:text="Only devices playing media audio (earbuds, headphones, speakers). Watches never keep it on, also not ones that take calls."
             android:textSize="12sp" />
 
         <Switch
