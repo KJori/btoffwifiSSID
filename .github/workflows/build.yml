@@ -65,3 +65,15 @@ jobs:
               --title "BT Off on Wi-Fi $v" \
               --notes "Download BtOffOnWifi.apk on the phone and open it to install or update. See the README for setup."
           fi
+
+      - name: Install fdroidserver
+        run: |
+          python3 -m venv "$RUNNER_TEMP/fdroid-venv"
+          "$RUNNER_TEMP/fdroid-venv/bin/pip" install --quiet fdroidserver
+          echo "$RUNNER_TEMP/fdroid-venv/bin" >> "$GITHUB_PATH"
+
+      - name: F-Droid repo (publishes on main with the release key, dry run elsewhere)
+        env:
+          FDROID_KEYSTORE_B64: ${{ secrets.FDROID_KEYSTORE_B64 }}
+          PUBLISH: ${{ github.ref == 'refs/heads/main' && env.SIGNED == 'release' && 'yes' || 'no' }}
+        run: fdroid/publish.sh
