@@ -1,6 +1,6 @@
 {
   "repo": {
-    "timestamp": 1795107242000,
+    "timestamp": 1795110315000,
     "version": 20002,
     "name": "KJori apps",
     "icon": "icon.png",
@@ -16,8 +16,8 @@
       "categories": [
         "Connectivity"
       ],
-      "suggestedVersionCode": "3",
-      "description": "Switches Bluetooth off while the phone is on one of your chosen Wi-Fi networks,\nand (optionally) back on once you have left.\n\n* Several Wi-Fi names; adjustable delay after arriving (default 5 min) and after leaving (default 1 min)\n* Stays on while earbuds or a headset are connected; watches and other low-energy devices do not count\n* \"Keep Bluetooth on\" timer from the app, a quick settings tile or the notification\n* No internet permission\n\nAndroid 13+ only lets apps that target Android 12 switch Bluetooth, so this app targets API 31 on purpose.\nLocation (\"Allow all the time\") is needed because Android only reveals the Wi-Fi name to apps with it.",
+      "suggestedVersionCode": "4",
+      "description": "Switches Bluetooth off while the phone is on one of your chosen Wi-Fi networks,\nand (optionally) back on once you have left.\n\n* Several Wi-Fi names; adjustable delay after arriving (default 5 min) and after leaving (default 1 min)\n* Stays on while earbuds or headphones are connected; watches never count\n* \"Keep Bluetooth on\" timer from the app, a quick settings tile or the notification\n* No internet permission\n\nAndroid 13+ only lets apps that target Android 12 switch Bluetooth, so this app targets API 31 on purpose.\nLocation (\"Allow all the time\") is needed because Android only reveals the Wi-Fi name to apps with it.",
       "issueTracker": "https://github.com/KJori/btoffwifiSSID/issues",
       "license": "Unknown",
       "name": "BT Off on Wi-Fi",
@@ -25,7 +25,7 @@
       "summary": "Turns Bluetooth off on your home Wi-Fi and back on when you leave",
       "added": 1795106752000,
       "packageName": "local.btoffonwifi",
-      "lastUpdated": 1795106752000,
+      "lastUpdated": 1795110315000,
       "localized": {
         "en-US": {
           "icon": "icon_8JGfjeKmKN28GEHcCd5mFN_zFPOE56upNWWljWY3xJ0=.png"
@@ -35,6 +35,70 @@
   ],
   "packages": {
     "local.btoffonwifi": [
+      {
+        "added": 1795110315000,
+        "apkName": "local.btoffonwifi_4.apk",
+        "hash": "271ff3e28b40134234897f473ff590d2f813b47765970e8ac2b7a123465b8c71",
+        "hashType": "sha256",
+        "minSdkVersion": 24,
+        "packageName": "local.btoffonwifi",
+        "sig": "4ecca1154d1732a8e77535e34c0cbb00",
+        "signer": "4d2aabcc4dfb19fad8ca5a6fd2a7ee55c77990e145ffae2acba00b60643be220",
+        "size": 37650,
+        "targetSdkVersion": 31,
+        "uses-permission": [
+          [
+            "android.permission.BLUETOOTH",
+            30
+          ],
+          [
+            "android.permission.BLUETOOTH_ADMIN",
+            30
+          ],
+          [
+            "android.permission.BLUETOOTH_CONNECT",
+            null
+          ],
+          [
+            "android.permission.ACCESS_WIFI_STATE",
+            null
+          ],
+          [
+            "android.permission.ACCESS_NETWORK_STATE",
+            null
+          ],
+          [
+            "android.permission.ACCESS_COARSE_LOCATION",
+            null
+          ],
+          [
+            "android.permission.ACCESS_FINE_LOCATION",
+            null
+          ],
+          [
+            "android.permission.ACCESS_BACKGROUND_LOCATION",
+            null
+          ],
+          [
+            "android.permission.FOREGROUND_SERVICE",
+            null
+          ],
+          [
+            "android.permission.RECEIVE_BOOT_COMPLETED",
+            null
+          ],
+          [
+            "android.permission.SCHEDULE_EXACT_ALARM",
+            null
+          ],
+          [
+            "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS",
+            null
+          ]
+        ],
+        "versionCode": 4,
+        "versionName": "1.3"
+      },
       {
         "added": 1795106752000,
         "apkName": "local.btoffonwifi_3.apk",

@@ -12,7 +12,7 @@ Description: |-
   and (optionally) back on once you have left.
 
   * Several Wi-Fi names; adjustable delay after arriving (default 5 min) and after leaving (default 1 min)
-  * Stays on while earbuds or a headset are connected; watches and other low-energy devices do not count
+  * Stays on while earbuds or headphones are connected; watches never count
   * "Keep Bluetooth on" timer from the app, a quick settings tile or the notification
   * No internet permission
 
