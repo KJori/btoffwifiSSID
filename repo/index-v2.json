@@ -14,7 +14,7 @@
       }
     },
     "address": "https://raw.githubusercontent.com/KJori/btoffwifiSSID/fdroid/repo",
-    "timestamp": 1795110315000,
+    "timestamp": 1795113201000,
     "categories": {
       "Connectivity": {
         "name": {
@@ -31,7 +31,7 @@
           "Connectivity"
         ],
         "issueTracker": "https://github.com/KJori/btoffwifiSSID/issues",
-        "lastUpdated": 1795110315000,
+        "lastUpdated": 1795113201000,
         "sourceCode": "https://github.com/KJori/btoffwifiSSID",
         "name": {
           "en-US": "BT Off on Wi-Fi"
@@ -52,6 +52,67 @@
         "preferredSigner": "4d2aabcc4dfb19fad8ca5a6fd2a7ee55c77990e145ffae2acba00b60643be220"
       },
       "versions": {
+        "7c9150c8bd89b64652fbb06a21257937e8f2a10e93fea2663d2755ee7206d191": {
+          "added": 1795113201000,
+          "file": {
+            "name": "/local.btoffonwifi_5.apk",
+            "sha256": "7c9150c8bd89b64652fbb06a21257937e8f2a10e93fea2663d2755ee7206d191",
+            "size": 55403
+          },
+          "manifest": {
+            "versionName": "1.4",
+            "versionCode": 5,
+            "usesSdk": {
+              "minSdkVersion": 24,
+              "targetSdkVersion": 31
+            },
+            "signer": {
+              "sha256": [
+                "4d2aabcc4dfb19fad8ca5a6fd2a7ee55c77990e145ffae2acba00b60643be220"
+              ]
+            },
+            "usesPermission": [
+              {
+                "name": "android.permission.BLUETOOTH",
+                "maxSdkVersion": 30
+              },
+              {
+                "name": "android.permission.BLUETOOTH_ADMIN",
+                "maxSdkVersion": 30
+              },
+              {
+                "name": "android.permission.BLUETOOTH_CONNECT"
+              },
+              {
+                "name": "android.permission.ACCESS_WIFI_STATE"
+              },
+              {
+                "name": "android.permission.ACCESS_NETWORK_STATE"
+              },
+              {
+                "name": "android.permission.ACCESS_COARSE_LOCATION"
+              },
+              {
+                "name": "android.permission.ACCESS_FINE_LOCATION"
+              },
+              {
+                "name": "android.permission.ACCESS_BACKGROUND_LOCATION"
+              },
+              {
+                "name": "android.permission.FOREGROUND_SERVICE"
+              },
+              {
+                "name": "android.permission.RECEIVE_BOOT_COMPLETED"
+              },
+              {
+                "name": "android.permission.SCHEDULE_EXACT_ALARM"
+              },
+              {
+                "name": "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+              }
+            ]
+          }
+        },
         "271ff3e28b40134234897f473ff590d2f813b47765970e8ac2b7a123465b8c71": {
           "added": 1795110315000,
           "file": {
