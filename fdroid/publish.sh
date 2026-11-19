@@ -29,6 +29,9 @@ mkdir -p repo/icons "metadata/$APP/en-US"
 [ -e "repo/${APP}_${VC}.apk" ] || cp "$ROOT/BtOffOnWifi.apk" "repo/${APP}_${VC}.apk"
 cp "$ROOT/fdroid/$APP.yml" "metadata/$APP.yml"
 cp "$ROOT/fdroid/icon.png" "metadata/$APP/en-US/icon.png"   # app icon
+rm -rf "metadata/$APP/en-US/phoneScreenshots"                # screenshots, in file-name order
+mkdir -p "metadata/$APP/en-US/phoneScreenshots"
+cp "$ROOT"/fdroid/screenshots/*.png "metadata/$APP/en-US/phoneScreenshots/"
 cp "$ROOT/fdroid/icon.png" repo/icons/icon.png               # repo icon
 if git rev-parse -q --verify HEAD > /dev/null \
         && [ -z "$(git status --porcelain -- repo/*.apk repo/icons/icon.png metadata)" ]; then

@@ -4,6 +4,16 @@ Turns Bluetooth off while the phone is connected to one of your chosen Wi-Fi net
 A timer keeps Bluetooth on temporarily; each press of the app button or the quick-settings
 tile ("BT timer") adds one step (15 min / 30 min / 1 h / 2 h, selectable), up to 24 h.
 
+<p>
+<img src="fdroid/screenshots/1_home_light.png" width="200" alt="At home, Bluetooth switched off">
+<img src="fdroid/screenshots/2_home_dark.png" width="200" alt="The same in dark theme">
+<img src="fdroid/screenshots/3_timer_light.png" width="200" alt="Timer keeping Bluetooth on">
+</p>
+
+Install from the F-Droid repo (F-Droid: Settings, Repositories, +):
+`https://raw.githubusercontent.com/KJori/btoffwifiSSID/fdroid/repo?fingerprint=D838FC7B6FC333C2E41FA2EB66FDBF025C466BD79C551FA28ED9F633EB12C488`
+or download the APK from the [latest release](https://github.com/KJori/btoffwifiSSID/releases/latest).
+
 Package `local.btoffonwifi`, version 1.4. Android 7.0 or newer. No internet permission.
 
 ## Install
@@ -55,5 +65,9 @@ if it is signed with the same key. `rtest/` holds the test suite (`rtest/ci.sh` 
 
 GitHub Actions (`.github/workflows/build.yml`) builds and tests every push. With the
 repository secret `KEYSTORE_B64` (the keystore, base64-encoded) the APK is release-signed, and a
-push to `main` with a new `versionName` publishes it as a GitHub release. `signing/` is kept out
+push to `main` with a new `versionName` publishes it as a GitHub release.
+The same run adds the APK to the F-Droid repository on the `fdroid` branch, signed with the
+`FDROID_KEYSTORE_B64` secret. The screenshots in `fdroid/screenshots/` are cropped from the ones
+`rtest/ScreenshotTest` renders on every build (pushed to the `screenshots` branch); refresh them
+after a visible UI change. `signing/` is kept out
 of the repository on purpose.
