@@ -2,205 +2,256 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/bg"
     android:fitsSystemWindows="true">
+
     <LinearLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="24dp">
 
-        <Switch
-            android:id="@+id/sw_enabled"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:text="Turn Bluetooth off on this Wi-Fi"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Wi-Fi names (SSID, exact, case-sensitive), one per line" />
-
-        <EditText
-            android:id="@+id/ed_ssid"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="top"
-            android:hint="e.g. HomeNetwork"
-            android:importantForAutofill="no"
-            android:inputType="text|textNoSuggestions|textMultiLine"
-            android:minHeight="48dp"
-            android:minLines="1" />
-
-        <Button
-            android:id="@+id/btn_current"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add current Wi-Fi" />
-
+        <!-- header: app name + master switch -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
+            android:minHeight="64dp"
+            android:orientation="horizontal"
+            android:paddingStart="8dp"
+            android:paddingEnd="4dp">
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Switch off after arriving:" />
-            <Spinner
-                android:id="@+id/sp_arrive"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/app_name"
+                    android:textColor="@color/text"
+                    android:textSize="22sp" />
+                <TextView
+                    android:id="@+id/tv_enabled"
+                    style="@style/RowSummary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+            <Switch
+                android:id="@+id/sw_enabled"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp" />
+                android:layout_height="48dp"
+                android:contentDescription="Automatic switching" />
         </LinearLayout>
 
-        <Switch
-            android:id="@+id/sw_audio"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:minHeight="48dp"
-            android:text="Keep Bluetooth on while earbuds or headphones are connected" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Only devices playing media audio (earbuds, headphones, speakers). Watches never keep it on, also not ones that take calls."
-            android:textSize="12sp" />
-
-        <Switch
-            android:id="@+id/sw_restore"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:minHeight="48dp"
-            android:text="Turn Bluetooth back on when I leave this Wi-Fi" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Only if this app switched it off. The wait keeps a short Wi-Fi drop-out from counting."
-            android:textSize="12sp" />
-
+        <!-- status -->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Back on after being away for:" />
-            <Spinner
-                android:id="@+id/sp_leave"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/tv_status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textIsSelectable="true" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="?android:attr/listDivider" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Keep Bluetooth on for a while"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Each press adds" />
-            <Spinner
-                android:id="@+id/sp_step"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:minHeight="48dp" />
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/btn_override"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="56dp"
-            android:text="Bluetooth on" />
-
-        <Button
-            android:id="@+id/btn_cancel"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="End timer now" />
-
-        <TextView
-            android:id="@+id/tv_override"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="?android:attr/listDivider" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Setup"
-            android:textSize="18sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tv_setup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:lineSpacingMultiplier="1.2" />
+            android:background="@drawable/bg_status"
+            android:orientation="vertical"
+            android:padding="20dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <FrameLayout
+                    android:id="@+id/status_circle"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@drawable/bg_circle">
+                    <ImageView
+                        android:id="@+id/img_status"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_bt_off" />
+                </FrameLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="18dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/tv_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/text"
+                        android:textSize="22sp" />
+                    <TextView
+                        android:id="@+id/tv_status"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textColor="@color/text"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginEnd="8dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_wifi"
+                    android:tint="@color/text2" />
+                <TextView
+                    android:id="@+id/tv_wifi"
+                    style="@style/RowSummary"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textIsSelectable="true" />
+            </LinearLayout>
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/btn_setup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Fix next" />
+        <!-- timer -->
+        <LinearLayout style="@style/Card">
+            <TextView style="@style/CardTitle" android:text="Keep Bluetooth on" />
+            <Button
+                android:id="@+id/btn_override"
+                style="@style/BtnFilled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="20dp" />
+            <TextView
+                android:id="@+id/tv_override"
+                style="@style/RowSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_horizontal"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp" />
+            <Button
+                android:id="@+id/btn_cancel"
+                style="@style/BtnOutline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:text="End timer" />
+            <include android:id="@+id/row_step" layout="@layout/row_setting" />
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/btn_tile"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Add quick settings tile" />
+        <!-- networks -->
+        <LinearLayout style="@style/Card">
+            <TextView style="@style/CardTitle" android:text="Bluetooth goes off on these Wi-Fi networks" />
+            <LinearLayout
+                android:id="@+id/list_networks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" />
+            <TextView
+                android:id="@+id/tv_no_networks"
+                style="@style/RowSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="20dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="4dp"
+                android:text="No networks yet. Add your home Wi-Fi while you are connected to it." />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp">
+                <Button
+                    android:id="@+id/btn_current"
+                    style="@style/BtnOutline"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:text="Add current Wi-Fi" />
+                <Button
+                    android:id="@+id/btn_add_name"
+                    style="@style/BtnText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:text="Add by name" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- behaviour -->
+        <LinearLayout style="@style/Card">
+            <TextView style="@style/CardTitle" android:text="Behaviour" />
+            <include android:id="@+id/row_arrive" layout="@layout/row_setting" />
+            <include android:id="@+id/row_restore" layout="@layout/row_setting" />
+            <include android:id="@+id/row_leave" layout="@layout/row_setting" />
+            <include android:id="@+id/row_audio" layout="@layout/row_setting" />
+        </LinearLayout>
+
+        <!-- setup, only while something is missing -->
+        <LinearLayout
+            android:id="@+id/card_setup"
+            style="@style/Card">
+            <TextView style="@style/CardTitle" android:text="Setup" />
+            <LinearLayout
+                android:id="@+id/list_setup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="4dp" />
+            <Button
+                android:id="@+id/btn_setup"
+                style="@style/BtnFilled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp" />
+        </LinearLayout>
+
+        <!-- extras -->
+        <LinearLayout style="@style/Card">
+            <include android:id="@+id/btn_tile" layout="@layout/row_setting" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_log"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textIsSelectable="true" />
-
-        <TextView
+            style="@style/RowSummary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="This app has no internet permission. Settings stay on this phone; nothing is sent anywhere."
-            android:textSize="12sp" />
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:textIsSelectable="true"
+            android:textSize="13sp" />
+
+        <TextView
+            style="@style/RowSummary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="No internet permission. Settings stay on this phone; nothing is sent anywhere."
+            android:textSize="13sp" />
     </LinearLayout>
 </ScrollView>

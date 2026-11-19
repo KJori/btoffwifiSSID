@@ -24,8 +24,10 @@ EOF
 
 CP="$ROOT/build/classes:cfg:$(ls lib/*.jar | tr '\n' ':')"
 rm -rf tc && mkdir -p tc
-javac -nowarn -cp "$CP:$PLAT" -d tc src/local/btoffonwifi/AppTest.java || exit 2
-java -Xmx2g -cp "tc:$CP:$PLAT" org.junit.runner.JUnitCore local.btoffonwifi.AppTest > test_out.txt 2>&1
+javac -nowarn -cp "$CP:$PLAT" -d tc src/local/btoffonwifi/*.java || exit 2
+mkdir -p screenshots
+java -Xmx2g -Dscreenshots.dir="$PWD/screenshots" -cp "tc:$CP:$PLAT" org.junit.runner.JUnitCore \
+    local.btoffonwifi.AppTest local.btoffonwifi.ScreenshotTest > test_out.txt 2>&1
 status=$?
 
 grep -E '^(OK \(|Tests run:)' test_out.txt

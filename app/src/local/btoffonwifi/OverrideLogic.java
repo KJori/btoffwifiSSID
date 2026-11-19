@@ -58,6 +58,32 @@ final class OverrideLogic {
         return sb.toString();
     }
 
+    /** The list without {@code name} (exact match per line, surrounding spaces ignored). */
+    static String removeTarget(String targets, String name) {
+        StringBuilder sb = new StringBuilder();
+        if (targets != null) {
+            for (String t : targets.split("\n")) {
+                t = t.trim();
+                if (t.isEmpty() || t.equals(name.trim())) continue;
+                if (sb.length() > 0) sb.append('\n');
+                sb.append(t);
+            }
+        }
+        return sb.toString();
+    }
+
+    /** The names one by one, blank lines skipped. */
+    static java.util.List<String> targetList(String targets) {
+        java.util.List<String> out = new java.util.ArrayList<>();
+        if (targets != null) {
+            for (String t : targets.split("\n")) {
+                t = t.trim();
+                if (!t.isEmpty()) out.add(t);
+            }
+        }
+        return out;
+    }
+
     /** Adds a name on its own line unless it is already in the list. */
     static String addTarget(String targets, String name) {
         if (name == null || name.trim().isEmpty() || matches(targets, name)) return targets == null ? "" : targets;

@@ -42,6 +42,18 @@ jobs:
       - name: Run tests
         run: ANDROID_SDK_ROOT="$ANDROID_HOME" rtest/ci.sh
 
+      - name: Publish screenshots (screenshots branch)
+        if: always() && hashFiles('rtest/screenshots/*.png') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd rtest/screenshots
+          git init -q -b screenshots
+          git add *.png
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Screenshots of ${GITHUB_REF_NAME} @ ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" screenshots
+
       - name: Upload APK and test log
         if: always()
         uses: actions/upload-artifact@v7

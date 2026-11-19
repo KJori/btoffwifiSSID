@@ -4,7 +4,7 @@ Turns Bluetooth off while the phone is connected to one of your chosen Wi-Fi net
 A timer keeps Bluetooth on temporarily; each press of the app button or the quick-settings
 tile ("BT timer") adds one step (15 min / 30 min / 1 h / 2 h, selectable), up to 24 h.
 
-Package `local.btoffonwifi`, version 1.3. Android 7.0 or newer. No internet permission.
+Package `local.btoffonwifi`, version 1.4. Android 7.0 or newer. No internet permission.
 
 ## Install
 1. Copy `BtOffOnWifi.apk` to the phone and open it. Allow "install unknown apps" when asked.

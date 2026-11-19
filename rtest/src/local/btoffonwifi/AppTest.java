@@ -430,7 +430,7 @@ public class AppTest {
         ActivityController<MainActivity> ac = Robolectric.buildActivity(MainActivity.class).setup();
         idle();
         String status = ((TextView) ac.get().findViewById(R.id.tv_status)).getText().toString();
-        assertTrue(status, status.contains("Pixel Buds connected"));
+        assertTrue(status, status.contains("Kept on for Pixel Buds"));
         ac.pause().stop().destroy();
     }
 
@@ -688,49 +688,72 @@ public class AppTest {
 
     // ---- screen ----
 
+    private void locationOn() {
+        if (Build.VERSION.SDK_INT >= 28) {
+            shadowOf((android.location.LocationManager) app.getSystemService(Context.LOCATION_SERVICE))
+                    .setLocationEnabled(true);
+        } else {
+            android.provider.Settings.Secure.putInt(app.getContentResolver(),
+                    android.provider.Settings.Secure.LOCATION_MODE, 3);
+        }
+    }
+
     @Test
     public void activityShowsStateAndButtonsWork() {
+        locationOn();
         watch("Home");
         onWifi("Home");
         ActivityController<MainActivity> ac = Robolectric.buildActivity(MainActivity.class).setup();
         MainActivity a = ac.get();
         idle();
 
-        assertEquals("Home", ((EditText) a.findViewById(R.id.ed_ssid)).getText().toString());
+        android.widget.LinearLayout nets = a.findViewById(R.id.list_networks);
+        assertEquals(1, nets.getChildCount());
+        assertEquals("Home", ((TextView) nets.getChildAt(0).findViewById(R.id.net_name)).getText().toString());
+        assertEquals("connected marker", View.VISIBLE, nets.getChildAt(0).findViewById(R.id.net_state).getVisibility());
         assertTrue(((Switch) a.findViewById(R.id.sw_enabled)).isChecked());
+        assertEquals("Bluetooth is off", ((TextView) a.findViewById(R.id.tv_title)).getText().toString());
+        assertTrue(((TextView) a.findViewById(R.id.tv_wifi)).getText().toString().contains("Home"));
+
         Switch restore = a.findViewById(R.id.sw_restore);
         assertTrue("restore option on by default", restore.isChecked());
         restore.performClick();
         assertFalse(p.restoreOnLeave());
-        restore.performClick();
+        a.findViewById(R.id.row_restore).performClick(); // the whole row toggles
         assertTrue(p.restoreOnLeave());
-        String status = ((TextView) a.findViewById(R.id.tv_status)).getText().toString();
-        assertTrue(status, status.contains("\"Home\"") && status.contains("(match)") && status.contains("Bluetooth: off"));
-        assertEquals(View.VISIBLE, a.findViewById(R.id.btn_tile).getVisibility());
+        assertTrue(((Switch) a.findViewById(R.id.sw_audio)).isChecked());
 
         Button override = a.findViewById(R.id.btn_override);
         Button cancel = a.findViewById(R.id.btn_cancel);
         assertFalse(cancel.isEnabled());
+        assertEquals(View.GONE, cancel.getVisibility());
         override.performClick();
         override.performClick();
         assertTrue(bt.isEnabled());
         assertTrue(p.until() > System.currentTimeMillis() + 55 * 60000L);
         assertTrue(cancel.isEnabled());
         assertTrue(((TextView) a.findViewById(R.id.tv_override)).getText().toString().contains("left"));
+        assertTrue(((TextView) a.findViewById(R.id.tv_status)).getText().toString().startsWith("Timer"));
 
         cancel.performClick();
         assertFalse("end now on target wifi turns bt off", bt.isEnabled());
         assertEquals(0, p.until());
 
-        ((EditText) a.findViewById(R.id.ed_ssid)).setText("  Office ");
-        assertEquals("Office", p.ssid());
-
         onWifi("Cafe");
         a.findViewById(R.id.btn_current).performClick();
-        assertEquals("current Wi-Fi is added to the list", "Office\nCafe", p.ssid());
+        assertEquals("current Wi-Fi is added to the list", "Home\nCafe", p.ssid());
         a.findViewById(R.id.btn_current).performClick();
-        assertEquals("not added twice", "Office\nCafe", p.ssid());
-        assertTrue(((Switch) a.findViewById(R.id.sw_audio)).isChecked());
+        assertEquals("not added twice", "Home\nCafe", p.ssid());
+        assertEquals(2, nets.getChildCount());
+        nets.getChildAt(0).findViewById(R.id.net_remove).performClick();
+        assertEquals("Cafe", p.ssid());
+        assertEquals(1, nets.getChildCount());
+
+        a.findViewById(R.id.row_arrive).performClick();
+        android.app.AlertDialog dlg = (android.app.AlertDialog) org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog();
+        assertNotNull("picker shown", dlg);
+        shadowOf(dlg).clickOnItem(3); // "5 min"
+        assertEquals(5, p.arriveDelayMin());
 
         Switch sw = a.findViewById(R.id.sw_enabled);
         sw.performClick();
@@ -738,12 +761,20 @@ public class AppTest {
         sw.performClick();
         assertTrue(p.enabled());
 
+        org.robolectric.shadows.ShadowAlertDialog.reset();
         a.findViewById(R.id.btn_tile).performClick();
         idle();
         // Android 13+: system "add tile" prompt is requested; older: instructions dialog is shown
         assertEquals(Build.VERSION.SDK_INT < 33,
                 org.robolectric.shadows.ShadowAlertDialog.getLatestAlertDialog() != null);
         ac.pause().stop().destroy();
+    }
+
+    @Test
+    public void networkListHelpers() {
+        assertEquals("Office", OverrideLogic.removeTarget("Home\nOffice", " Home "));
+        assertEquals("", OverrideLogic.removeTarget("Home", "Home"));
+        assertEquals(java.util.Arrays.asList("Home", "Office"), OverrideLogic.targetList(" Home \n\nOffice"));
     }
 
     @Test
