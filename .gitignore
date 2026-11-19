@@ -7,3 +7,9 @@ signing/
 *.apk
 build/
 rtest/target/
+
+# Test harness downloads and output
+rtest/lib/
+rtest/cfg/
+rtest/tc/
+rtest/test_out.txt

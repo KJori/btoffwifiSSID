@@ -43,4 +43,9 @@ Package `local.btoffonwifi`, version 1.1. Android 7.0 or newer. No internet perm
 Needs JDK 17 and an Android SDK with `build-tools;34.0.0` and `platforms;android-34`.
 `ANDROID_SDK_ROOT=/path/to/sdk ./build.sh` writes `BtOffOnWifi.apk`.
 `signing/release.jks` is the signing key; a rebuilt APK only installs over the existing app
-if it is signed with the same key. `rtest/` holds the test suite (`rtest/run.sh`).
+if it is signed with the same key. `rtest/` holds the test suite (`rtest/ci.sh` after `./build.sh`).
+
+GitHub Actions (`.github/workflows/build.yml`) builds and tests every push. With the
+repository secret `KEYSTORE_B64` (the keystore, base64-encoded) the APK is release-signed, and a
+push to `main` with a new `versionName` publishes it as a GitHub release. `signing/` is kept out
+of the repository on purpose.
