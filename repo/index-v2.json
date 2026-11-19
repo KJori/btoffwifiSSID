@@ -9,12 +9,12 @@
     "icon": {
       "en-US": {
         "name": "/icons/icon.png",
-        "sha256": "5e13443364836be26a7c6a9a37f6ef6bd2c954277e42d49e7d659214cc6ab9f8",
-        "size": 918
+        "sha256": "9f86cc26623955338b2286e76b50508eb9643624f594747395b59a9cdc173799",
+        "size": 14652
       }
     },
     "address": "https://raw.githubusercontent.com/KJori/btoffwifiSSID/fdroid/repo",
-    "timestamp": 1795106752000,
+    "timestamp": 1795107242000,
     "categories": {
       "Connectivity": {
         "name": {
@@ -41,6 +41,13 @@
         },
         "description": {
           "en-US": "Switches Bluetooth off while the phone is on one of your chosen Wi-Fi networks,\nand (optionally) back on once you have left.\n\n* Several Wi-Fi names; adjustable delay after arriving (default 5 min) and after leaving (default 1 min)\n* Stays on while earbuds or a headset are connected; watches and other low-energy devices do not count\n* \"Keep Bluetooth on\" timer from the app, a quick settings tile or the notification\n* No internet permission\n\nAndroid 13+ only lets apps that target Android 12 switch Bluetooth, so this app targets API 31 on purpose.\nLocation (\"Allow all the time\") is needed because Android only reveals the Wi-Fi name to apps with it."
+        },
+        "icon": {
+          "en-US": {
+            "name": "/local.btoffonwifi/en-US/icon_8JGfjeKmKN28GEHcCd5mFN_zFPOE56upNWWljWY3xJ0=.png",
+            "sha256": "f0919f8de2a628ddbc1841dc09de6614dff314f384e7aba93565a58d6637c49d",
+            "size": 13387
+          }
         },
         "preferredSigner": "4d2aabcc4dfb19fad8ca5a6fd2a7ee55c77990e145ffae2acba00b60643be220"
       },

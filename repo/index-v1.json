@@ -1,6 +1,6 @@
 {
   "repo": {
-    "timestamp": 1795106752000,
+    "timestamp": 1795107242000,
     "version": 20002,
     "name": "KJori apps",
     "icon": "icon.png",
@@ -25,7 +25,12 @@
       "summary": "Turns Bluetooth off on your home Wi-Fi and back on when you leave",
       "added": 1795106752000,
       "packageName": "local.btoffonwifi",
-      "lastUpdated": 1795106752000
+      "lastUpdated": 1795106752000,
+      "localized": {
+        "en-US": {
+          "icon": "icon_8JGfjeKmKN28GEHcCd5mFN_zFPOE56upNWWljWY3xJ0=.png"
+        }
+      }
     }
   ],
   "packages": {
